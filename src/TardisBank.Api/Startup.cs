@@ -27,20 +27,7 @@ namespace TardisBank.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            var routing = new RouteBuilder(app);
-
-            routing.MapGet("/", context => 
-            {
-                return context.Response.WriteAsync("Hello World!");
-            });
-
-            routing.MapGet("/{name}", context => 
-            {
-                var name = (string)context.GetRouteValue("name");
-                return context.Response.WriteAsync($"Hello {name}!");
-            });
-
-            app.UseRouter(routing.Build());
+            app.UseRouter(new RouteBuilder(app).CreateRoutes().Build());
         }
     }
 }
