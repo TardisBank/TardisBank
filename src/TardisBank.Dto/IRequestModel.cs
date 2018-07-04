@@ -1,4 +1,4 @@
-namespace TardisBank.Client
+namespace TardisBank.Dto
 {
     public interface IRequestModel
     {

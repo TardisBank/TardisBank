@@ -1,4 +1,4 @@
-namespace TardisBank.Api
+namespace TardisBank.Dto
 {
     public class RegisterReqeust : IRequestModel
     {

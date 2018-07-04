@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace TardisBank.Api
+namespace TardisBank.Dto
 {
     public interface IResponseModel
     {
