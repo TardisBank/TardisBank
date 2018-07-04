@@ -1,21 +1,19 @@
 
 # API
 
-- Create application. GET / should work.
-
-- Deploy to Azure.
+- ~~Create application. GET / should work.~~
 
 - Sign up with email/pw. Should create account. Create DB.
+
+- Auth login returns token.
+
+- Auth header validation for all other requests.
 
 - Show account info on GET /
 
 - Delete account. DELETE /
 
 - Verify Email on signup.
-
-- Auth login returns token.
-
-- Auth header validation for all other requests.
 
 - Forgotten password.
 
@@ -38,6 +36,8 @@
 - List Schedules GET children/child-id/schedule
 
 - Run scheduler.
+
+- Deploy to Azure.
 
 # FE
 
