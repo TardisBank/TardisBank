@@ -21,7 +21,17 @@ namespace TardisBank.Dto
             });
         }
 
-        public LinkModel[] Links => links.ToArray();
+        public LinkModel[] Links
+        {
+            get 
+            {
+                return links.ToArray();
+            }
+            set
+            {
+                links = new List<LinkModel>(value);
+            }
+        } 
     }
 
     public class LinkModel
