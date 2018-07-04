@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TardisBank.Api", "TardisBank.Api\TardisBank.Api.csproj", "{9CC4D414-836A-4962-A89D-58EFF49E91F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TardisBank.Client", "TardisBank.Client\TardisBank.Client.csproj", "{C9C42C8E-AB53-40E2-A073-A73EED371BDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,17 @@ Global
 		{9CC4D414-836A-4962-A89D-58EFF49E91F3}.Release|x64.Build.0 = Release|Any CPU
 		{9CC4D414-836A-4962-A89D-58EFF49E91F3}.Release|x86.ActiveCfg = Release|Any CPU
 		{9CC4D414-836A-4962-A89D-58EFF49E91F3}.Release|x86.Build.0 = Release|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Debug|x64.Build.0 = Debug|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Debug|x86.Build.0 = Debug|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Release|x64.ActiveCfg = Release|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Release|x64.Build.0 = Release|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Release|x86.ActiveCfg = Release|Any CPU
+		{C9C42C8E-AB53-40E2-A073-A73EED371BDB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
