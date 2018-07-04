@@ -10,7 +10,7 @@ namespace TardisBank.Api
         {
             routeBuilder.MapGetHandler("/", context => 
             {
-                return Task.FromResult(new HomeUnauthenticatedResponseModel());
+                return Task.FromResult(new HomeUnauthenticatedResponse());
             });
 
             routeBuilder.MapGet("/{name}", context => 
