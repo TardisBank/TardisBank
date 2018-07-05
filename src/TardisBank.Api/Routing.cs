@@ -11,7 +11,9 @@ namespace TardisBank.Api
         {
             routeBuilder.MapGetHandler("/", context => 
                 {
-                    return Task.FromResult(new HomeUnauthenticatedResponse());
+                    var response = new HomeUnauthenticatedResponse();
+                    response.AddLink(Rels.Register, "/register");
+                    return Task.FromResult(response);
                 });
 
             routeBuilder.MapPostHandler<RegisterReqeust, RegisterResponse>(

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TardisBank.Dto
 {
@@ -20,6 +22,11 @@ namespace TardisBank.Dto
                 Href = href
             });
         }
+
+        public LinkModel Link(string rel) => 
+            links
+                .Where(x => x.Rel == rel)
+                .SingleOrDefault() ?? throw new ApplicationException($"Rel '{rel}' not found.");
 
         public LinkModel[] Links
         {

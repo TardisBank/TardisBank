@@ -21,7 +21,7 @@ namespace TardisBank.Api
             routeBuilder.MapGet(template, async context => 
             {
                 var responseModel = await handler(context);
-                responseModel.AddLink("self", context.Request.Path);
+                responseModel.AddLink(Rels.Self, context.Request.Path);
                 var json = JsonConvert.SerializeObject(responseModel);
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.Headers.Add("Content-Type", new StringValues("application/json"));
@@ -37,7 +37,7 @@ namespace TardisBank.Api
             where TRequest: IRequestModel
             where TResponse: IResponseModel
         {
-            routeBuilder.MapGet(template, async context => 
+            routeBuilder.MapPost(template, async context => 
             {
                 string requestBody = null;
                 using(var reader = new StreamReader(context.Request.Body))
@@ -46,7 +46,7 @@ namespace TardisBank.Api
                 }
                 var requestModel = JsonConvert.DeserializeObject<TRequest>(requestBody);
                 var responseModel = await handler(context, requestModel);
-                responseModel.AddLink("self", context.Request.Path);
+                responseModel.AddLink(Rels.Self, context.Request.Path);
                 var json = JsonConvert.SerializeObject(responseModel);
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.Headers.Add("Content-Type", new StringValues("application/json"));

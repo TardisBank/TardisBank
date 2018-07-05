@@ -31,6 +31,14 @@ namespace TardisBank.Client
         public Task<T> Get<T>(LinkModel link)
             => Send<T>(link, HttpMethod.Get);
 
+        public Task<TResponse> Post<TRequest, TResponse>(LinkModel link, TRequest request)
+        {
+            if(request == null) throw new ArgumentNullException(nameof(request));
+
+            var requestBody = JsonConvert.SerializeObject(request);
+            return Send<TResponse>(link, HttpMethod.Post, requestBody);
+        }
+
         public async Task<T> Send<T>(
             LinkModel link, 
             HttpMethod method,
