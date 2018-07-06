@@ -76,5 +76,24 @@ namespace TardisBank.IntegrationTests
             Assert.Equal(login.PasswordHash, returnedLogin.PasswordHash);
             Assert.True(returnedLogin.LoginId > 0);
         }
+
+        [Fact]
+        public async Task ShouldBeAbleToGetLoginByEmail()
+        {
+            var login = new Login
+            {
+                Email = $"{Guid.NewGuid().ToString()}@mailinator.com",
+                PasswordHash = Guid.NewGuid().ToString()
+            };
+
+            await Db.InsertLogin(connectionString, login);
+            var result = await Db.LoginByEmail(connectionString, login.Email);
+
+            Assert.True(result.HasValue);
+            var returnedLogin = result.Value;
+            Assert.Equal(login.Email, returnedLogin.Email);
+            Assert.Equal(login.PasswordHash, returnedLogin.PasswordHash);
+            Assert.True(returnedLogin.LoginId > 0);
+        }
     }
 }
