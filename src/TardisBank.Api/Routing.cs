@@ -2,6 +2,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using TardisBank.Dto;
+using E247.Fun;
+using System;
 
 namespace TardisBank.Api
 {
@@ -9,6 +11,8 @@ namespace TardisBank.Api
     {
         public static RouteBuilder CreateRoutes(this RouteBuilder routeBuilder)
         {
+            var connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
+
             routeBuilder.MapGetHandler("/", context => 
                 {
                     var response = new HomeUnauthenticatedResponse();
@@ -16,12 +20,21 @@ namespace TardisBank.Api
                     return Task.FromResult(response);
                 });
 
-            routeBuilder.MapPostHandler<RegisterReqeust, RegisterResponse>(
+            routeBuilder.MapPostHandler<RegisterRequest, RegisterResponse>(
                 "/register", 
-                (context, registerRequest) => 
-                {
-                    return Task.FromResult(new RegisterResponse());
-                });
+                async (context, registerRequest) => 
+                    await registerRequest.Validate()
+                        .BindAsync(dto => Db.LoginByEmail(connectionString, dto.Email)
+                            .Match(
+                                Some: _ => Result<RegisterRequest, TardisFault>.Fail(
+                                    new TardisFault("Email already exists")),
+                                None: () => Result<RegisterRequest, TardisFault>.Succeed(dto)
+                            )
+                        )
+                        .Map(dto => dto.ToModel())
+                        .MapAsync(login => Db.InsertLogin(connectionString, login))
+                        .Map(login => login.ToDto())
+                );
 
             routeBuilder.MapGet("/{name}", context => 
                 {

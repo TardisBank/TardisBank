@@ -1,6 +1,6 @@
 namespace TardisBank.Dto
 {
-    public class RegisterReqeust : IRequestModel
+    public class RegisterRequest : IRequestModel
     {
         public string Email { get; set; }
         public string Password { get; set; }

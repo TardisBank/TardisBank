@@ -26,10 +26,10 @@ namespace TardisBank.IntegrationTests
         public async Task PostRegisterShouldWork()
         {
             var home = await client.GetHome();
-            var result = await client.Post<RegisterReqeust, RegisterResponse>(home.Link(Rels.Register), new RegisterReqeust
+            var result = await client.Post<RegisterRequest, RegisterResponse>(home.Link(Rels.Register), new RegisterRequest
             {
-                Email = "dude@mailinator.com",
-                Password = "t0p_s3cReT"
+                Email = $"{Guid.NewGuid().ToString()}@mailinator.com",
+                Password = Guid.NewGuid().ToString()
             });
 
             Assert.NotNull(result);

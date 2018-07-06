@@ -1,10 +1,7 @@
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Npgsql;
 using TardisBank.Api;
-using TardisBank.Client;
-using TardisBank.Dto;
 using Xunit;
 using Xunit.Abstractions;
 
