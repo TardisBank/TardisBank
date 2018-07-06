@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Npgsql;
+using TardisBank.Api;
 using TardisBank.Client;
 using TardisBank.Dto;
 using Xunit;
@@ -12,16 +13,17 @@ namespace TardisBank.IntegrationTests
     public class DbTests
     {
         private readonly ITestOutputHelper output;
+        private readonly string connectionString;
 
         public DbTests(ITestOutputHelper output)
         {
             this.output = output;
+            connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
         }
 
         [Fact]
         public void ShouldBeAbleToConnectToDb()
         {
-            var connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
             var email = $"{Guid.NewGuid().ToString()}@mailinator.com";
             var password = Guid.NewGuid().ToString();
 
@@ -57,6 +59,22 @@ namespace TardisBank.IntegrationTests
                 Assert.Equal(1, count);
                 Assert.Equal(email, actualEmail);
             }
+        }
+
+        [Fact]
+        public async Task ShouldBeAbleToInsertLogin()
+        {
+            var login = new Login
+            {
+                Email = $"{Guid.NewGuid().ToString()}@mailinator.com",
+                PasswordHash = Guid.NewGuid().ToString()
+            };
+
+            var returnedLogin = await Db.InsertLogin(connectionString, login);
+
+            Assert.Equal(login.Email, returnedLogin.Email);
+            Assert.Equal(login.PasswordHash, returnedLogin.PasswordHash);
+            Assert.True(returnedLogin.LoginId > 0);
         }
     }
 }

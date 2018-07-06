@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TardisBank.Client\TardisBank.Client.csproj" />
+    <ProjectReference Include="..\TardisBank.Api\TardisBank.Api.csproj" />
+    <ProjectReference Include="..\TardisBank.Dto\TardisBank.Dto.csproj" />
   </ItemGroup>
 
 </Project>
