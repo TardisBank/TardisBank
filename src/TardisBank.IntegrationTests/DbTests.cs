@@ -11,7 +11,6 @@ namespace TardisBank.IntegrationTests
 {
     public class DbTests
     {
-        const string connectionString = "Host=localhost;Username=tardisbank_app;Password=_wHaT3v3R;Database=tardisbank";
         private readonly ITestOutputHelper output;
 
         public DbTests(ITestOutputHelper output)
@@ -22,6 +21,7 @@ namespace TardisBank.IntegrationTests
         [Fact]
         public void ShouldBeAbleToConnectToDb()
         {
+            var connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
             var email = $"{Guid.NewGuid().ToString()}@mailinator.com";
             var password = Guid.NewGuid().ToString();
 

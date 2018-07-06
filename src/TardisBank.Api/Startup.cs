@@ -22,6 +22,7 @@ namespace TardisBank.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            var connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
