@@ -16,12 +16,11 @@ namespace TardisBank.Api
             routeBuilder.MapGetHandler("/", context => 
                 {
                     var response = new HomeUnauthenticatedResponse();
-                    response.AddLink(Rels.Register, "/register");
                     return Task.FromResult(response);
                 });
 
             routeBuilder.MapPostHandler<RegisterRequest, RegisterResponse>(
-                "/register", 
+                "/", 
                 async (context, registerRequest) => 
                     await registerRequest.Validate()
                         .BindAsync(dto => Db.LoginByEmail(connectionString, dto.Email)
@@ -34,6 +33,11 @@ namespace TardisBank.Api
                         .Map(dto => dto.ToModel())
                         .MapAsync(login => Db.InsertLogin(connectionString, login))
                         .Map(login => login.ToDto())
+                );
+
+            routeBuilder.MapPostHandler<LoginRequest, LoginResponse>(
+                "/login", 
+                (context, registerRequest) => Task.FromResult(Result<LoginResponse, TardisFault>.Succeed(new LoginResponse()))
                 );
 
             routeBuilder.MapGet("/{name}", context => 

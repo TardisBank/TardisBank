@@ -3,7 +3,7 @@
 
 - ~~Create application. GET / should work.~~
 
-- Sign up with email/pw. Should create account. Create DB.
+- ~~Sign up with email/pw. Should create account. Create DB.~~
 
 - Auth login returns token.
 

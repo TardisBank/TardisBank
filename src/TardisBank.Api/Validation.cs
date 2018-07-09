@@ -23,5 +23,24 @@ namespace TardisBank.Api
 
             return registerRequest;
         }
+
+        public static Result<LoginRequest, TardisFault> Validate(
+            this LoginRequest loginRequest)
+        {
+            if(loginRequest == null)
+            {
+                return new TardisFault("request body missing");
+            }
+            if(string.IsNullOrEmpty(loginRequest.Email))
+            {
+                return new TardisFault("Email missing");
+            }
+            if(string.IsNullOrEmpty(loginRequest.Password))
+            {
+                return new TardisFault("Password is missing");
+            }
+
+            return loginRequest;
+        }
     }
 }
