@@ -5,7 +5,7 @@
 
 - ~~Sign up with email/pw. Should create account. Create DB.~~
 
-- Auth login returns token.
+- ~~Auth login returns token~~.
 
 - Auth header validation for all other requests.
 

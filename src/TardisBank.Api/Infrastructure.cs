@@ -23,6 +23,7 @@ namespace TardisBank.Api
             {
                 var responseModel = await handler(context);
                 responseModel.AddLink(Rels.Self, context.Request.Path);
+                responseModel.AddLink(Rels.Home, "/");
                 var json = JsonConvert.SerializeObject(responseModel);
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 context.Response.Headers.Add("Content-Type", new StringValues("application/json"));
@@ -52,6 +53,7 @@ namespace TardisBank.Api
                     Success: responseModel => {
                         context.Response.StatusCode = (int)HttpStatusCode.OK;
                         responseModel.AddLink(Rels.Self, context.Request.Path);
+                        responseModel.AddLink(Rels.Home, "/");
                         return JsonConvert.SerializeObject(responseModel);
                     },
                     Failure: x => 
