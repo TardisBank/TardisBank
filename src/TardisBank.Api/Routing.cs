@@ -12,6 +12,7 @@ namespace TardisBank.Api
         public static RouteBuilder CreateRoutes(this RouteBuilder routeBuilder)
         {
             var connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
+            var encryptionKey = Environment.GetEnvironmentVariable("TARDISBANK_KEY");
 
             routeBuilder.MapGetHandler("/", context => 
                 {
@@ -37,7 +38,7 @@ namespace TardisBank.Api
 
             routeBuilder.MapPostHandler<LoginRequest, LoginResponse>(
                 "/login", 
-                (context, registerRequest) => Task.FromResult(Result<LoginResponse, TardisFault>.Succeed(new LoginResponse()))
+                (context, loginRequest) => Task.FromResult(Result<LoginResponse, TardisFault>.Succeed(new LoginResponse()))
                 );
 
             routeBuilder.MapGet("/{name}", context => 
