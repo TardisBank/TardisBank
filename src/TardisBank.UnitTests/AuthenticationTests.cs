@@ -20,16 +20,9 @@ namespace TardisBank.UnitTests
         public void ShouldBeAbleToEncryptAndDecryptToken()
         {
             var encryptionKey = GenerateKey();
-            var login = new Login
-            {
-                Email = "foo@bar.com",
-                PasswordHash = "xyz",
-                LoginId = 101
-            };
-            var createdTime = new DateTimeOffset(2018, 7, 9, 0, 0, 0, TimeSpan.FromTicks(0));
 
-            var token = Authentication.CreateToken(encryptionKey, () => createdTime, login);
-            var returnedLogin = Authentication.DecryptToken(encryptionKey, () => createdTime.AddMinutes(30), token);
+            var token = Authentication.CreateToken(encryptionKey, () => now, login);
+            var returnedLogin = Authentication.DecryptToken(encryptionKey, () => now, token);
 
             Assert.True(returnedLogin.HasValue);
             Assert.Equal(login.Email, returnedLogin.Value.Email);
@@ -41,17 +34,10 @@ namespace TardisBank.UnitTests
         public void TokenValidationShouldFailIfExpired()
         {
             var encryptionKey = GenerateKey();
-            var login = new Login
-            {
-                Email = "foo@bar.com",
-                PasswordHash = "xyz",
-                LoginId = 101
-            };
-            var createdTime = new DateTimeOffset(2018, 7, 9, 0, 0, 0, TimeSpan.FromTicks(0));
-            var tokenSubmissionTime = createdTime.AddHours(2);
+            var twoHoursLater = now.AddHours(2);
 
-            var token = Authentication.CreateToken(encryptionKey, () => createdTime, login);
-            var returnedLogin = Authentication.DecryptToken(encryptionKey, () => tokenSubmissionTime, token);
+            var token = Authentication.CreateToken(encryptionKey, () => now, login);
+            var returnedLogin = Authentication.DecryptToken(encryptionKey, () => twoHoursLater, token);
 
             Assert.False(returnedLogin.HasValue);
         }
@@ -60,17 +46,10 @@ namespace TardisBank.UnitTests
         public void TokenValidationShouldFailIfWrongKeyIsUsed()
         {
             var encryptionKey = GenerateKey();
-            var decryptionKey = GenerateKey();
-            var login = new Login
-            {
-                Email = "foo@bar.com",
-                PasswordHash = "xyz",
-                LoginId = 101
-            };
-            var createdTime = new DateTimeOffset(2018, 7, 9, 0, 0, 0, TimeSpan.FromTicks(0));
+            var incorrectDecryptionKey = GenerateKey();
 
-            var token = Authentication.CreateToken(encryptionKey, () => createdTime, login);
-            var returnedLogin = Authentication.DecryptToken(decryptionKey, () => createdTime, token);
+            var token = Authentication.CreateToken(encryptionKey, () => now, login);
+            var returnedLogin = Authentication.DecryptToken(incorrectDecryptionKey, () => now, token);
 
             Assert.False(returnedLogin.HasValue);
         }
@@ -80,13 +59,6 @@ namespace TardisBank.UnitTests
         {
             var encryptionKey = GenerateKey();
             var decryptionKey = GenerateKey();
-            var login = new Login
-            {
-                Email = "foo@bar.com",
-                PasswordHash = "xyz",
-                LoginId = 101
-            };
-            var now = new DateTimeOffset(2018, 7, 9, 0, 0, 0, TimeSpan.FromTicks(0));
 
             var token = "invliad token";
             var returnedLogin = Authentication.DecryptToken(decryptionKey, () => now, token);
@@ -96,5 +68,14 @@ namespace TardisBank.UnitTests
 
         private string GenerateKey()
             => Convert.ToBase64String(new TripleDESCryptoServiceProvider().Key);
+
+        private Login login = new Login
+        {
+            Email = "foo@bar.com",
+            PasswordHash = "xyz",
+            LoginId = 101
+        };
+
+        DateTimeOffset now = new DateTimeOffset(2018, 7, 9, 0, 0, 0, TimeSpan.FromTicks(0));
     }
 }
