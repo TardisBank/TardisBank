@@ -9,7 +9,9 @@ namespace TardisBank.Api
 {
     public static class Authentication
     {
-        public static string CreateToken(string encryptionKey, Login login)
+        private static readonly TimeSpan tokenPeriod = TimeSpan.FromHours(1);
+
+        public static string CreateToken(string encryptionKey, Func<DateTimeOffset> now, Login login)
         {
             if(encryptionKey == null) throw new ArgumentNullException(encryptionKey);
             if(login == null) throw new ArgumentNullException(nameof(login));
@@ -17,12 +19,17 @@ namespace TardisBank.Api
             var tes = new TripleDESCryptoServiceProvider();
             tes.Key = Convert.FromBase64String(encryptionKey);
 
-            var jsonBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new Login
-            {
-                Email = login.Email,
-                LoginId = login.LoginId,
-                PasswordHash = string.Empty
-            }));
+            var jsonBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
+                new Token
+                {
+                    Login = new Login
+                    {
+                        Email = login.Email,
+                        LoginId = login.LoginId,
+                        PasswordHash = string.Empty
+                    },
+                    Expires = now()
+                }));
 
             var encriptor = tes.CreateEncryptor();
             var resultBytes = encriptor.TransformFinalBlock(jsonBytes, 0, jsonBytes.Length);
@@ -33,7 +40,7 @@ namespace TardisBank.Api
             return $"{resultBase64}:{iv}";
         }
 
-        public static Maybe<Login> DecryptToken(string encryptionKey, string token)
+        public static Maybe<Login> DecryptToken(string encryptionKey, Func<DateTimeOffset> now, string token)
         {
             if(encryptionKey == null) throw new ArgumentNullException(encryptionKey);
             if(token == null) throw new ArgumentNullException(nameof(token));
@@ -41,7 +48,7 @@ namespace TardisBank.Api
             var tokenParts = token.Split(':');
             if(tokenParts.Length != 2)
             {
-                return Maybe<Login>.Empty();
+                return loginNothing;
             }
 
             var encodedBytes = Convert.FromBase64String(tokenParts[0]);
@@ -51,13 +58,27 @@ namespace TardisBank.Api
             tes.Key = Convert.FromBase64String(encryptionKey);
             tes.IV = iv;
 
-            var decryptor = tes.CreateDecryptor();
-            var jsonBytes = decryptor.TransformFinalBlock(encodedBytes, 0, encodedBytes.Length);
-            var json = Encoding.UTF8.GetString(jsonBytes);
+            string json = null;
+            try
+            {
+                var decryptor = tes.CreateDecryptor();
+                var jsonBytes = decryptor.TransformFinalBlock(encodedBytes, 0, encodedBytes.Length);
+                json = Encoding.UTF8.GetString(jsonBytes);
+            }
+            catch(System.Security.Cryptography.CryptographicException)
+            {
+                return loginNothing;
+            }
 
-            var login = JsonConvert.DeserializeObject<Login>(json);
+            var tokenModel = JsonConvert.DeserializeObject<Token>(json);
+            if(tokenModel.Expires.Add(tokenPeriod) < now())
+            {
+                return loginNothing;
+            }
             
-            return login;
+            return tokenModel.Login;
         }
+
+        private static readonly Maybe<Login> loginNothing = Maybe<Login>.Empty();
     }
 }

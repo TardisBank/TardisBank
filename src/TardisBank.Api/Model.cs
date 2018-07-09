@@ -36,4 +36,10 @@ namespace TardisBank.Api
         Week,
         Month
     }
+
+    public class Token
+    {
+        public Login Login { get; set; }
+        public DateTimeOffset Expires { get; set; }
+    }
 }
