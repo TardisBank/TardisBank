@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Routing;
 using TardisBank.Dto;
 using E247.Fun;
 using System;
+using static E247.Fun.Result<TardisBank.Api.Login, TardisBank.Api.TardisFault>;
 
 namespace TardisBank.Api
 {
@@ -38,7 +39,19 @@ namespace TardisBank.Api
 
             routeBuilder.MapPostHandler<LoginRequest, LoginResponse>(
                 "/login", 
-                (context, loginRequest) => Task.FromResult(Result<LoginResponse, TardisFault>.Succeed(new LoginResponse()))
+                async (context, loginRequest) => 
+                    await loginRequest.Validate()
+                        .BindAsync(dto => Db.LoginByEmail(connectionString, dto.Email)
+                            .Match(
+                                Some: login => Succeed(login),
+                                None: () => Fail(new TardisFault("Unknown Email or Password."))
+                            )
+                        )
+                        .Bind(login => Password.HashMatches(loginRequest.Password, login.PasswordHash)
+                            ? Succeed(login)
+                            : Fail(new TardisFault("Unknown Email or Password.")))
+                        .Map(login => Authentication.CreateToken(encryptionKey, () => DateTimeOffset.Now, login))
+                        .Map(token => new LoginResponse { Token = token })
                 );
 
             routeBuilder.MapGet("/{name}", context => 
