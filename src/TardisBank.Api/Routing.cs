@@ -10,11 +10,10 @@ namespace TardisBank.Api
 {
     public static class Routing
     {
-        public static RouteBuilder CreateRoutes(this RouteBuilder routeBuilder)
+        public static RouteBuilder CreateRoutes(
+            this RouteBuilder routeBuilder,
+            AppConfiguration appConfiguration)
         {
-            var connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
-            var encryptionKey = Environment.GetEnvironmentVariable("TARDISBANK_KEY");
-
             routeBuilder.MapGetHandler("/", context => 
                 {
                     var response = new HomeUnauthenticatedResponse();
@@ -26,7 +25,7 @@ namespace TardisBank.Api
                 "/", 
                 async (context, registerRequest) => 
                     await registerRequest.Validate()
-                        .BindAsync(dto => Db.LoginByEmail(connectionString, dto.Email)
+                        .BindAsync(dto => Db.LoginByEmail(appConfiguration.ConnectionString, dto.Email)
                             .Match(
                                 Some: _ => Result<RegisterRequest, TardisFault>.Fail(
                                     new TardisFault("Email already exists")),
@@ -34,7 +33,7 @@ namespace TardisBank.Api
                             )
                         )
                         .Map(dto => dto.ToModel())
-                        .MapAsync(login => Db.InsertLogin(connectionString, login))
+                        .MapAsync(login => Db.InsertLogin(appConfiguration.ConnectionString, login))
                         .Map(login => login.ToDto())
                 );
 
@@ -42,7 +41,7 @@ namespace TardisBank.Api
                 "/login", 
                 async (context, loginRequest) => 
                     await loginRequest.Validate()
-                        .BindAsync(dto => Db.LoginByEmail(connectionString, dto.Email)
+                        .BindAsync(dto => Db.LoginByEmail(appConfiguration.ConnectionString, dto.Email)
                             .Match(
                                 Some: login => Succeed(login),
                                 None: () => Fail(new TardisFault("Unknown Email or Password."))
@@ -51,7 +50,7 @@ namespace TardisBank.Api
                         .Bind(login => Password.HashMatches(loginRequest.Password, login.PasswordHash)
                             ? Succeed(login)
                             : Fail(new TardisFault("Unknown Email or Password.")))
-                        .Map(login => Authentication.CreateToken(encryptionKey, () => DateTimeOffset.Now, login))
+                        .Map(login => Authentication.CreateToken(appConfiguration.EncryptionKey, () => DateTimeOffset.Now, login))
                         .Map(token => new LoginResponse { Token = token })
                 );
 

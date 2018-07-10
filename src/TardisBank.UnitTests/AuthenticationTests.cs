@@ -1,6 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
+using E247.Fun;
+using Microsoft.AspNetCore.Http;
+using Moq;
 using TardisBank.Api;
 using Xunit;
 
@@ -64,6 +70,65 @@ namespace TardisBank.UnitTests
             var returnedLogin = Authentication.DecryptToken(decryptionKey, () => now, token);
 
             Assert.False(returnedLogin.HasValue);
+        }
+
+        [Fact]
+        public async Task AuthenticateShouldPopulateUserOnSuccess()
+        {
+            var request = new Mock<HttpRequest>();
+            var response = new Mock<HttpResponse>();
+            var context = new Mock<HttpContext>();
+            var headers = new HeaderDictionary();
+            var items = new Dictionary<object, object>();
+
+            context.Setup(x => x.Request).Returns(request.Object);
+            context.Setup(x => x.Response).Returns(response.Object);
+            context.Setup(x => x.Items).Returns(items);
+            request.Setup(x => x.Headers).Returns(headers);
+
+            headers.Add("Authorization", "Bearer my-token");
+            var expectedLogin = new Login();
+            bool nextWasCalled = false;
+            Func<Task> next = () => 
+            {
+                nextWasCalled = true;
+                return Task.FromResult(0);
+            };
+
+            var authenticate = Authentication.Authenticate(x => expectedLogin);
+            await authenticate(context.Object, next);
+
+            Assert.True(nextWasCalled);
+            Assert.Equal(expectedLogin, context.Object.GetAuthenticatedLogin());
+        }
+
+        [Fact]
+        public async Task AuthenticateShouldCallNextWhenNoAuthHeaderExists()
+        {
+            var request = new Mock<HttpRequest>();
+            var response = new Mock<HttpResponse>();
+            var context = new Mock<HttpContext>();
+            var headers = new HeaderDictionary();
+            var items = new Dictionary<object, object>();
+
+            context.Setup(x => x.Request).Returns(request.Object);
+            context.Setup(x => x.Response).Returns(response.Object);
+            context.Setup(x => x.Items).Returns(items);
+            request.Setup(x => x.Headers).Returns(headers);
+
+            var expectedLogin = new Login();
+            bool nextWasCalled = false;
+            Func<Task> next = () => 
+            {
+                nextWasCalled = true;
+                return Task.FromResult(0);
+            };
+
+            var authenticate = Authentication.Authenticate(x => expectedLogin);
+            await authenticate(context.Object, next);
+
+            Assert.True(nextWasCalled);
+            Assert.False(context.Object.IsAuthenticated());
         }
 
         private string GenerateKey()

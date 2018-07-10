@@ -4,6 +4,9 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 using E247.Fun;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace TardisBank.Api
 {
@@ -78,6 +81,60 @@ namespace TardisBank.Api
             
             return tokenModel.Login;
         }
+
+        const string authHeaderName = "Authorization";
+        const string contextLoginKey = "tardisbank.login";
+
+        public static Func<HttpContext, Func<Task>, Task> Authenticate(Func<string, Maybe<Login>> decryptToken)
+        {
+            return async (context, next) =>
+            {
+                if(!context.Request.Headers.ContainsKey(authHeaderName))
+                {
+                    await next();
+                    return;
+                }
+
+                var authHeader = context.Request.Headers[authHeaderName];
+                if(authHeader.Count > 0 && authHeader[0].StartsWith("Bearer"))
+                {
+                    var headerParts = authHeader[0].Split(' ');
+                    if(headerParts.Length == 2)
+                    {
+                        decryptToken(headerParts[1]).Match(
+                            Some: login => 
+                            { 
+                                var principal = new ClaimsPrincipal(new ClaimsIdentity(new[]{
+                                    new Claim("Email", login.Email),
+                                    new Claim("loginId", login.LoginId.ToString())
+                                }));
+                                context.User = principal;
+                                context.Items.Add(contextLoginKey, login);
+                            },
+                            None: () => {}
+                        );
+                    }
+                }
+
+                if(context.IsAuthenticated())
+                {
+                    await next();
+                }
+                else
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("{ \"Message\": \"Authentication Failed\" }");
+                }
+            };
+        }
+
+        public static bool IsAuthenticated(this HttpContext context)
+            => context.Items.ContainsKey(contextLoginKey);
+
+        public static Maybe<Login> GetAuthenticatedLogin(this HttpContext context)
+            => IsAuthenticated(context) 
+                ? context.Items[contextLoginKey] as Login
+                : Maybe<Login>.Empty();
 
         private static readonly Maybe<Login> loginNothing = Maybe<Login>.Empty();
     }
