@@ -17,11 +17,11 @@
 
 - Forgotten password.
 
-- Add Child.
+- ~~Add Account.~~
 
-- List Children. GET children/
+- ~~List Accouts. GET children/~~
 
-- Del Child.
+- Del Account.
 
 - Credit Transaction.
 

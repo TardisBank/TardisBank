@@ -5,14 +5,14 @@ using System.Linq;
 using System;
 using System.Data;
 using E247.Fun;
+using System.Collections.Generic;
 
 namespace TardisBank.Api
 {
     public static class Db
     {
         public static Task<Login> InsertLogin(string connectionString, Login login)
-        {
-            return WithConnection(connectionString, async conn =>
+            => WithConnection(connectionString, async conn =>
             {
                 var result = await conn.QueryAsync<Login>(
                     "INSERT INTO login (email, password_hash) " + 
@@ -22,11 +22,9 @@ namespace TardisBank.Api
 
                 return result.Single();
             });
-        }
 
         public static Task<Maybe<Login>> LoginByEmail(string connectionString, string email)
-        {
-            return WithConnection<Maybe<Login>>(connectionString, 
+            => WithConnection<Maybe<Login>>(connectionString, 
             async conn =>
             {
                 var result = await conn.QueryAsync<Login>(
@@ -40,15 +38,42 @@ namespace TardisBank.Api
                 }
                 return Maybe<Login>.Empty();
             });
-        }
 
         public static Task DeleteLogin(string connectionString, Login login)
-        {
-            return WithConnection(connectionString, async conn =>
+            => WithConnection(connectionString, async conn =>
             {
                 await conn.ExecuteAsync("DELETE FROM login WHERE login_id = @LoginId", login);
             });
-        }
+
+        public static Task<Account> InsertAccount(string connectionString, Account account)
+            => WithConnection<Account>(connectionString, async conn => 
+            {
+                var result = await conn.QueryAsync<Account>(
+                    "INSERT INTO account (login_id, account_name) " + 
+                    "VALUES (@LoginId, @AccountName) " + 
+                    "RETURNING account_id as AccountId, login_id as LoginId, account_name as AccountName",
+                    account);
+
+                return result.Single();
+            });
+
+        public static Task<IEnumerable<Account>> AccountByLogin(string connectionString, Login login)
+            => WithConnection<IEnumerable<Account>>(connectionString, async conn => 
+            {
+                var result = await conn.QueryAsync<Account>(
+                    "SELECT account_id as AccountId, login_id as LoginId, account_name as AccountName " +
+                    "FROM account " +
+                    "WHERE login_id = @LoginId", 
+                    login);
+
+                return result;
+            });
+
+        public static Task DeleteAccount(string connectionString, Account account)
+            => WithConnection(connectionString, async conn => 
+            {
+                await conn.ExecuteAsync("DELETE FROM account WHERE account_id = @AccountId", account);
+            });
 
         private async static Task<T> WithConnection<T>(
             string connectionString, 

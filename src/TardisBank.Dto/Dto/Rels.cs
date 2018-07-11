@@ -5,5 +5,6 @@ namespace TardisBank.Dto
         public const string Self = "self";
         public const string Home = "home";
         public const string Login = "login";
+        public const string Account = "account";
     }
 }

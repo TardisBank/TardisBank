@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -5,6 +6,8 @@ using TardisBank.Dto;
 using E247.Fun;
 using System;
 using static E247.Fun.Result<TardisBank.Api.Login, TardisBank.Api.TardisFault>;
+using System.Net;
+using System.Collections.Generic;
 
 namespace TardisBank.Api
 {
@@ -19,7 +22,11 @@ namespace TardisBank.Api
                     var response = new HomeResponse();
                     context.GetAuthenticatedLogin()
                         .Match(
-                            Some: login => response.Email = login.Email,
+                            Some: login => 
+                            { 
+                                response.Email = login.Email;
+                                response.AddLink(Rels.Account, "/account");
+                            },
                             None: () => response.AddLink(Rels.Login, "/login")
                         );
                     return Task.FromResult(Result<HomeResponse, TardisFault>.Succeed(response));
@@ -70,6 +77,27 @@ namespace TardisBank.Api
                         .Map(login => Authentication.CreateToken(appConfiguration.EncryptionKey, () => DateTimeOffset.Now, login))
                         .Map(token => new LoginResponse { Token = token }),
                 authenticated: false);
+
+            routeBuilder.MapPostHandler<AccountRequest, AccountResponse>(
+                "/account",
+                async (context, accountRequest) =>
+                    await accountRequest.Validate()
+                        .Map((AccountRequest x) => context.GetAuthenticatedLogin()
+                            .Match(
+                                Some: login => x.ToModel(login), 
+                                None: () => throw new ApplicationException("Expected auth token not present")))
+                        .MapAsync((Account account) => Db.InsertAccount(appConfiguration.ConnectionString, account))
+                        .Map((Account account) => account.ToDto())
+                );
+    
+            routeBuilder.MapGetHandler<AccountResponseCollection>(
+                "/account",
+                async context =>
+                    await context.GetAuthenticatedLogin()
+                        .ToTardisResult(HttpStatusCode.InternalServerError, "Expected auth token not present")
+                        .MapAsync(login => Db.AccountByLogin(appConfiguration.ConnectionString, login))
+                        .Map((IEnumerable<Account> accounts) => accounts.ToDto())
+                );
 
             return routeBuilder;
         }

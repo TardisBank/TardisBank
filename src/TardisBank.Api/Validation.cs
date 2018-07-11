@@ -42,5 +42,20 @@ namespace TardisBank.Api
 
             return loginRequest;
         }
+
+        public static Result<AccountRequest, TardisFault> Validate(
+            this AccountRequest accountRequest)
+        {
+            if(accountRequest == null)
+            {
+                return new TardisFault("request body missing");
+            }
+            if(string.IsNullOrEmpty(accountRequest.AccountName))
+            {
+                return new TardisFault("AccountName is missing");
+            }
+
+            return accountRequest;
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace TardisBank.Api
     public class Account
     {
         public int AccountId { get; set; }
+        public int LoginId { get; set; }
         public string AccountName { get; set; }
     }
 

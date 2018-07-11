@@ -99,6 +99,29 @@ namespace TardisBank.IntegrationTests
             var loginResult = await client.Post<LoginRequest, LoginResponse>(unauthenticatedHome.Link(Rels.Login), login);
         }
 
+        [Fact]
+        public async Task PostAndGetAccountShouldWork()
+        {
+            var authenticatedClient = await RegisterAndLogin();
+            var home = await authenticatedClient.GetHome();
+
+            var account = new AccountRequest
+            {
+                AccountName = Guid.NewGuid().ToString()
+            };
+
+            {
+                var result = await authenticatedClient.Post<AccountRequest, AccountResponse>(home.Link(Rels.Account), account);
+                Assert.Equal(account.AccountName, result.AccountName);
+            }
+
+            {
+                var result = await authenticatedClient.Get<AccountResponseCollection>(home.Link(Rels.Account));
+                Assert.Collection(result.Accounts, 
+                    x => Assert.Equal(account.AccountName, x.AccountName));
+            }
+        }
+
         public async Task<ClientConfig> RegisterAndLogin(
             string email = null,
             string password = null)
