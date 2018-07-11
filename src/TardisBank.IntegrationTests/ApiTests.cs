@@ -10,7 +10,7 @@ namespace TardisBank.IntegrationTests
     public class ApiTests
     {
         const string baseUri = "http://localhost.fiddler:5000/";
-        private TardisBankClient client = new TardisBankClient(new Uri(baseUri), new HttpClient());
+        private ClientConfig client = new ClientConfig(new Uri(baseUri), new HttpClient());
 
         [Fact]
         public async Task GetHomeShouldWork()
@@ -18,8 +18,9 @@ namespace TardisBank.IntegrationTests
             var result = await client.GetHome();
 
             Assert.Collection(result.Links, 
-                x => Assert.Equal(Rels.Home, x.Rel),
-                x => Assert.Equal(Rels.Self, x.Rel));
+                x => Assert.Equal(Rels.Login, x.Rel),
+                x => Assert.Equal(Rels.Self, x.Rel),
+                x => Assert.Equal(Rels.Home, x.Rel));
         }
 
         [Fact]
@@ -58,6 +59,43 @@ namespace TardisBank.IntegrationTests
             var loginResult = await client.Post<LoginRequest, LoginResponse>(home.Link(Rels.Login), login);
 
             Assert.NotNull(loginResult);
+        }
+
+        [Fact]
+        public async Task GetAuthentictedHomeShouldWork()
+        {
+            var authenticatedClient = await RegisterAndLogin();
+
+            var home = await authenticatedClient.GetHome();
+
+            Assert.Collection(home.Links, 
+                x => Assert.Equal(Rels.Login, x.Rel),
+                x => Assert.Equal(Rels.Self, x.Rel),
+                x => Assert.Equal(Rels.Home, x.Rel));
+        }
+
+        public async Task<ClientConfig> RegisterAndLogin(
+            string email = null,
+            string password = null)
+        {
+            var home = await client.GetHome();
+            var registration = new RegisterRequest
+            {
+                Email = email ?? $"{Guid.NewGuid().ToString()}@mailinator.com",
+                Password = password ?? Guid.NewGuid().ToString()
+            };
+
+            var registrationResult = await client.Post<RegisterRequest, RegisterResponse>(home.Link(Rels.Home), registration);
+
+            var login = new LoginRequest
+            {
+                Email = registration.Email,
+                Password = registration.Password
+            };
+
+            var loginResult = await client.Post<LoginRequest, LoginResponse>(home.Link(Rels.Login), login);
+
+            return new ClientConfig(client.BaseUri, client.HttpClient, loginResult.Token);
         }
     }
 }
