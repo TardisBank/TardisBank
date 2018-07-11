@@ -12,8 +12,8 @@ namespace TardisBank.Client
     {
         const string jsonMediaType = "application/json";
 
-        public static Task<HomeUnauthenticatedResponse> GetHome(this ClientConfig config)
-            => config.Get<HomeUnauthenticatedResponse>(new LinkModel 
+        public static Task<HomeResponse> GetHome(this ClientConfig config)
+            => config.Get<HomeResponse>(new LinkModel 
             {
                 Rel = "home",
                 Href = "/"

@@ -16,8 +16,16 @@ namespace TardisBank.Api
         {
             routeBuilder.MapGetHandler("/", context => 
                 {
-                    var response = new HomeUnauthenticatedResponse();
-                    response.AddLink(Rels.Login, "/login");
+                    var response = new HomeResponse();
+                    if(context.IsAuthenticated())
+                    {
+                        var login = context.GetAuthenticatedLogin().Value;
+                        response.Email = login.Email;
+                    }
+                    else
+                    {
+                        response.AddLink(Rels.Login, "/login");
+                    }
                     return Task.FromResult(response);
                 });
 

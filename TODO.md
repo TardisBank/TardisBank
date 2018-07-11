@@ -7,9 +7,9 @@
 
 - ~~Auth login returns token~~.
 
-- Auth header validation for all other requests.
+- ~~Auth header validation for all other requests.~~
 
-- Show account info on GET /
+- ~~Show account info on GET / ~~
 
 - Delete account. DELETE /
 

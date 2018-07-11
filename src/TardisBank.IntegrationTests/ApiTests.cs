@@ -64,14 +64,16 @@ namespace TardisBank.IntegrationTests
         [Fact]
         public async Task GetAuthentictedHomeShouldWork()
         {
-            var authenticatedClient = await RegisterAndLogin();
+            var email = $"{Guid.NewGuid().ToString()}@mailinator.com";
+            var authenticatedClient = await RegisterAndLogin(email);
 
             var home = await authenticatedClient.GetHome();
 
             Assert.Collection(home.Links, 
-                x => Assert.Equal(Rels.Login, x.Rel),
                 x => Assert.Equal(Rels.Self, x.Rel),
                 x => Assert.Equal(Rels.Home, x.Rel));
+
+            Assert.Equal(email, home.Email);
         }
 
         public async Task<ClientConfig> RegisterAndLogin(
