@@ -26,7 +26,7 @@ namespace TardisBank.Api
                     {
                         response.AddLink(Rels.Login, "/login");
                     }
-                    return Task.FromResult(response);
+                    return Task.FromResult(Result<HomeResponse, TardisFault>.Succeed(response));
                 });
 
             routeBuilder.MapPostHandler<RegisterRequest, RegisterResponse>(

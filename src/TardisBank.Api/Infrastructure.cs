@@ -16,19 +16,20 @@ namespace TardisBank.Api
         public static IRouteBuilder MapGetHandler<T>(
             this IRouteBuilder routeBuilder,
             string template,
-            Func<HttpContext, Task<T>> handler)
+            Func<HttpContext, Task<Result<T, TardisFault>>> handler)
             where T: IResponseModel
         {
-            routeBuilder.MapGet(template, async context => 
-            {
-                var responseModel = await handler(context);
-                responseModel.AddLink(Rels.Self, context.Request.Path);
-                responseModel.AddLink(Rels.Home, "/");
-                var json = JsonConvert.SerializeObject(responseModel);
-                context.Response.StatusCode = (int)HttpStatusCode.OK;
-                context.Response.Headers.Add("Content-Type", new StringValues("application/json"));
-                await context.Response.WriteAsync(json);
-            });
+            routeBuilder.MapVerbHandler("GET", template, handler); 
+            return routeBuilder;
+        }
+
+        public static IRouteBuilder MapDeleteHandler<T>(
+            this IRouteBuilder routeBuilder,
+            string template,
+            Func<HttpContext, Task<Result<T, TardisFault>>> handler)
+            where T: IResponseModel
+        {
+            routeBuilder.MapVerbHandler("DELETE", template, handler); 
             return routeBuilder;
         }
 
@@ -39,15 +40,62 @@ namespace TardisBank.Api
             where TRequest: IRequestModel
             where TResponse: IResponseModel
         {
-            routeBuilder.MapPost(template, async context => 
-            {
-                string requestBody = null;
-                using(var reader = new StreamReader(context.Request.Body))
+            routeBuilder.MapVerbWithRequestBodyHandler("POST", template, handler);
+            return routeBuilder;
+        }
+
+        public static IRouteBuilder MapPutHandler<TRequest, TResponse>(
+            this IRouteBuilder routeBuilder,
+            string template,
+            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler)
+            where TRequest: IRequestModel
+            where TResponse: IResponseModel
+        {
+            routeBuilder.MapVerbWithRequestBodyHandler("PUT", template, handler);
+            return routeBuilder;
+        }
+
+        public static IRouteBuilder MapVerbWithRequestBodyHandler<TRequest, TResponse>(
+            this IRouteBuilder routeBuilder,
+            string verb,
+            string template,
+            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler)
+            where TRequest: IRequestModel
+            where TResponse: IResponseModel
+        {
+            return MapVerbHandler(
+                routeBuilder,
+                verb,
+                template,
+                async (HttpContext context) => 
                 {
-                    requestBody = await reader.ReadToEndAsync();
+                    string requestBody = null;
+                    using(var reader = new StreamReader(context.Request.Body))
+                    {
+                        requestBody = await reader.ReadToEndAsync();
+                    }
+                    var requestModel = JsonConvert.DeserializeObject<TRequest>(requestBody);
+                    var result = await handler(context, requestModel);
+                    return result;
                 }
-                var requestModel = JsonConvert.DeserializeObject<TRequest>(requestBody);
-                var result = await handler(context, requestModel);
+            );
+        }
+
+        public static IRouteBuilder MapVerbHandler<TResponse>(
+            this IRouteBuilder routeBuilder,
+            string verb,
+            string template,
+            Func<HttpContext, Task<Result<TResponse, TardisFault>>> handler)
+            where TResponse: IResponseModel
+        {
+            if(routeBuilder == null) throw new ArgumentNullException(nameof(routeBuilder));
+            if(verb == null) throw new ArgumentNullException(nameof(verb));
+            if(template == null) throw new ArgumentNullException(nameof(template));
+            if(handler == null) throw new ArgumentNullException(nameof(handler));
+
+            routeBuilder.MapVerb(verb, template, async context => 
+            {
+                var result = await handler(context);
 
                 var json = result.Match(
                     Success: responseModel => {
