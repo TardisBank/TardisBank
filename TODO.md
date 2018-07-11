@@ -9,9 +9,9 @@
 
 - ~~Auth header validation for all other requests.~~
 
-- ~~Show account info on GET / ~~
+- ~~Show account info on GET /~~
 
-- ~~Delete account. DELETE / ~~
+- ~~Delete account. DELETE /~~
 
 - Verify Email on signup.
 
