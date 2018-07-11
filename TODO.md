@@ -11,7 +11,7 @@
 
 - ~~Show account info on GET / ~~
 
-- Delete account. DELETE /
+- ~~Delete account. DELETE / ~~
 
 - Verify Email on signup.
 

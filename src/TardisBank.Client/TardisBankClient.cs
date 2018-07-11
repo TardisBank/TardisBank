@@ -22,6 +22,9 @@ namespace TardisBank.Client
         public static Task<T> Get<T>(this ClientConfig config, LinkModel link)
             => Send<T>(config, link, HttpMethod.Get);
 
+        public static Task<T> Delete<T>(this ClientConfig config, LinkModel link)
+            => Send<T>(config, link, HttpMethod.Delete);
+
         public static Task<TResponse> Post<TRequest, TResponse>(this ClientConfig config, LinkModel link, TRequest request)
         {
             if(request == null) throw new ArgumentNullException(nameof(request));

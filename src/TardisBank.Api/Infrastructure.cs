@@ -16,42 +16,46 @@ namespace TardisBank.Api
         public static IRouteBuilder MapGetHandler<T>(
             this IRouteBuilder routeBuilder,
             string template,
-            Func<HttpContext, Task<Result<T, TardisFault>>> handler)
+            Func<HttpContext, Task<Result<T, TardisFault>>> handler,
+            bool authenticated = true)
             where T: IResponseModel
         {
-            routeBuilder.MapVerbHandler("GET", template, handler); 
+            routeBuilder.MapVerbHandler("GET", template, handler, authenticated); 
             return routeBuilder;
         }
 
         public static IRouteBuilder MapDeleteHandler<T>(
             this IRouteBuilder routeBuilder,
             string template,
-            Func<HttpContext, Task<Result<T, TardisFault>>> handler)
+            Func<HttpContext, Task<Result<T, TardisFault>>> handler,
+            bool authenticated = true)
             where T: IResponseModel
         {
-            routeBuilder.MapVerbHandler("DELETE", template, handler); 
+            routeBuilder.MapVerbHandler("DELETE", template, handler, authenticated); 
             return routeBuilder;
         }
 
         public static IRouteBuilder MapPostHandler<TRequest, TResponse>(
             this IRouteBuilder routeBuilder,
             string template,
-            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler)
+            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler,
+            bool authenticated = true)
             where TRequest: IRequestModel
             where TResponse: IResponseModel
         {
-            routeBuilder.MapVerbWithRequestBodyHandler("POST", template, handler);
+            routeBuilder.MapVerbWithRequestBodyHandler("POST", template, handler, authenticated);
             return routeBuilder;
         }
 
         public static IRouteBuilder MapPutHandler<TRequest, TResponse>(
             this IRouteBuilder routeBuilder,
             string template,
-            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler)
+            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler,
+            bool authenticated = true)
             where TRequest: IRequestModel
             where TResponse: IResponseModel
         {
-            routeBuilder.MapVerbWithRequestBodyHandler("PUT", template, handler);
+            routeBuilder.MapVerbWithRequestBodyHandler("PUT", template, handler, authenticated);
             return routeBuilder;
         }
 
@@ -59,7 +63,8 @@ namespace TardisBank.Api
             this IRouteBuilder routeBuilder,
             string verb,
             string template,
-            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler)
+            Func<HttpContext, TRequest, Task<Result<TResponse, TardisFault>>> handler,
+            bool authenticated = true)
             where TRequest: IRequestModel
             where TResponse: IResponseModel
         {
@@ -77,7 +82,8 @@ namespace TardisBank.Api
                     var requestModel = JsonConvert.DeserializeObject<TRequest>(requestBody);
                     var result = await handler(context, requestModel);
                     return result;
-                }
+                },
+                authenticated
             );
         }
 
@@ -85,7 +91,8 @@ namespace TardisBank.Api
             this IRouteBuilder routeBuilder,
             string verb,
             string template,
-            Func<HttpContext, Task<Result<TResponse, TardisFault>>> handler)
+            Func<HttpContext, Task<Result<TResponse, TardisFault>>> handler,
+            bool authenticated = true)
             where TResponse: IResponseModel
         {
             if(routeBuilder == null) throw new ArgumentNullException(nameof(routeBuilder));
@@ -95,6 +102,13 @@ namespace TardisBank.Api
 
             routeBuilder.MapVerb(verb, template, async context => 
             {
+                if(authenticated && !context.IsAuthenticated())
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync(ErrorResponse("Forbidden"));
+                    return;
+                }
+
                 var result = await handler(context);
 
                 var json = result.Match(
@@ -107,7 +121,7 @@ namespace TardisBank.Api
                     Failure: x => 
                     {
                         context.Response.StatusCode = (int)x.HttpStatusCode;
-                        return $"{{ \"Message\": \"{x.Message}\" }}";
+                        return ErrorResponse(x.Message);
                     });
 
                 context.Response.Headers.Add("Content-Type", new StringValues("application/json"));
@@ -115,5 +129,8 @@ namespace TardisBank.Api
             });
             return routeBuilder;
         }
+
+        public static string ErrorResponse(string message)
+            => $"{{ \"Message\": \"{message}\" }}";
     }
 }

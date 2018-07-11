@@ -42,6 +42,14 @@ namespace TardisBank.Api
             });
         }
 
+        public static Task DeleteLogin(string connectionString, Login login)
+        {
+            return WithConnection(connectionString, async conn =>
+            {
+                await conn.ExecuteAsync("DELETE FROM login WHERE login_id = @LoginId", login);
+            });
+        }
+
         private async static Task<T> WithConnection<T>(
             string connectionString, 
             Func<IDbConnection, Task<T>> connectionFunction)
@@ -51,6 +59,18 @@ namespace TardisBank.Api
                 conn.Open();
 
                 return await connectionFunction(conn);
+            }
+        }
+
+        private async static Task WithConnection(
+            string connectionString, 
+            Func<IDbConnection, Task> connectionFunction)
+        {
+            using (var conn = new NpgsqlConnection(connectionString))
+            {
+                conn.Open();
+
+                await connectionFunction(conn);
             }
         }
     }

@@ -23,7 +23,20 @@ namespace TardisBank.Api
                             None: () => response.AddLink(Rels.Login, "/login")
                         );
                     return Task.FromResult(Result<HomeResponse, TardisFault>.Succeed(response));
-                });
+                },
+                authenticated: false);
+
+            routeBuilder.MapDeleteHandler<HomeResponse>("/", context => 
+                    context.GetAuthenticatedLogin()
+                        .MatchAsync(
+                            Some: async login => 
+                            { 
+                                await Db.DeleteLogin(appConfiguration.ConnectionString, login);
+                                return (Result<HomeResponse, TardisFault>)new HomeResponse();
+                            },
+                            None: () => new HomeResponse()
+                        )
+                );
 
             routeBuilder.MapPostHandler<RegisterRequest, RegisterResponse>(
                 "/", 
@@ -38,8 +51,8 @@ namespace TardisBank.Api
                         )
                         .Map(dto => dto.ToModel())
                         .MapAsync(login => Db.InsertLogin(appConfiguration.ConnectionString, login))
-                        .Map(login => login.ToDto())
-                );
+                        .Map(login => login.ToDto()),
+                authenticated: false);
 
             routeBuilder.MapPostHandler<LoginRequest, LoginResponse>(
                 "/login", 
@@ -55,14 +68,8 @@ namespace TardisBank.Api
                             ? Succeed(login)
                             : Fail(new TardisFault("Unknown Email or Password.")))
                         .Map(login => Authentication.CreateToken(appConfiguration.EncryptionKey, () => DateTimeOffset.Now, login))
-                        .Map(token => new LoginResponse { Token = token })
-                );
-
-            routeBuilder.MapGet("/{name}", context => 
-                {
-                    var name = (string)context.GetRouteValue("name");
-                    return context.Response.WriteAsync($"Hello {name}!");
-                });
+                        .Map(token => new LoginResponse { Token = token }),
+                authenticated: false);
 
             return routeBuilder;
         }

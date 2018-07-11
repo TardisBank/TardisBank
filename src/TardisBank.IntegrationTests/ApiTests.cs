@@ -76,6 +76,29 @@ namespace TardisBank.IntegrationTests
             Assert.Equal(email, home.Email);
         }
 
+        [Fact]
+        public async Task DeleteLoginShouldWork()
+        {
+            var email = $"{Guid.NewGuid().ToString()}@mailinator.com";
+            var password = Guid.NewGuid().ToString();
+
+            var authenticatedClient = await RegisterAndLogin(email, password);
+            var home = await authenticatedClient.GetHome();
+
+            await authenticatedClient.Delete<HomeResponse>(home.Link(Rels.Self));
+
+            var unauthenticatedHome = await client.GetHome();
+
+            // attempt to login...
+            var login = new LoginRequest
+            {
+                Email = email,
+                Password = password
+            };
+
+            var loginResult = await client.Post<LoginRequest, LoginResponse>(unauthenticatedHome.Link(Rels.Login), login);
+        }
+
         public async Task<ClientConfig> RegisterAndLogin(
             string email = null,
             string password = null)
