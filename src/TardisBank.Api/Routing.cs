@@ -17,15 +17,11 @@ namespace TardisBank.Api
             routeBuilder.MapGetHandler("/", context => 
                 {
                     var response = new HomeResponse();
-                    if(context.IsAuthenticated())
-                    {
-                        var login = context.GetAuthenticatedLogin().Value;
-                        response.Email = login.Email;
-                    }
-                    else
-                    {
-                        response.AddLink(Rels.Login, "/login");
-                    }
+                    context.GetAuthenticatedLogin()
+                        .Match(
+                            Some: login => response.Email = login.Email,
+                            None: () => response.AddLink(Rels.Login, "/login")
+                        );
                     return Task.FromResult(Result<HomeResponse, TardisFault>.Succeed(response));
                 });
 
