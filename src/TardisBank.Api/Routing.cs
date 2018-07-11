@@ -66,11 +66,7 @@ namespace TardisBank.Api
                 async (context, loginRequest) => 
                     await loginRequest.Validate()
                         .BindAsync(dto => Db.LoginByEmail(appConfiguration.ConnectionString, dto.Email)
-                            .Match(
-                                Some: login => Succeed(login),
-                                None: () => Fail(new TardisFault("Unknown Email or Password."))
-                            )
-                        )
+                            .ToTardisResult(HttpStatusCode.InternalServerError, "Unknown Email or Password."))
                         .Bind(login => Password.HashMatches(loginRequest.Password, login.PasswordHash)
                             ? Succeed(login)
                             : Fail(new TardisFault("Unknown Email or Password.")))
@@ -82,12 +78,12 @@ namespace TardisBank.Api
                 "/account",
                 async (context, accountRequest) =>
                     await accountRequest.Validate()
-                        .Map((AccountRequest x) => context.GetAuthenticatedLogin()
-                            .Match(
-                                Some: login => x.ToModel(login), 
-                                None: () => throw new ApplicationException("Expected auth token not present")))
-                        .MapAsync((Account account) => Db.InsertAccount(appConfiguration.ConnectionString, account))
-                        .Map((Account account) => account.ToDto())
+                        .Bind(dto => context.GetAuthenticatedLogin()
+                            .ToTardisResult(HttpStatusCode.InternalServerError, "Expected auth token not present")
+                            .Map(login => dto.ToModel(login))
+                        )
+                        .MapAsync(account => Db.InsertAccount(appConfiguration.ConnectionString, account))
+                        .Map(account => account.ToDto())
                 );
     
             routeBuilder.MapGetHandler<AccountResponseCollection>(
