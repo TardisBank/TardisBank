@@ -79,7 +79,7 @@ namespace TardisBank.Api
                 async (context, accountRequest) =>
                     await accountRequest.Validate()
                         .Bind(dto => context.GetAuthenticatedLogin()
-                            .ToTardisResult(HttpStatusCode.InternalServerError, "Expected auth token not present")
+                            .AssertLogin()
                             .Map(login => dto.ToModel(login))
                         )
                         .MapAsync(account => Db.InsertAccount(appConfiguration.ConnectionString, account))
@@ -90,7 +90,7 @@ namespace TardisBank.Api
                 "/account",
                 async context =>
                     await context.GetAuthenticatedLogin()
-                        .ToTardisResult(HttpStatusCode.InternalServerError, "Expected auth token not present")
+                        .AssertLogin()
                         .MapAsync(login => Db.AccountByLogin(appConfiguration.ConnectionString, login))
                         .Map((IEnumerable<Account> accounts) => accounts.ToDto())
                 );
@@ -99,8 +99,13 @@ namespace TardisBank.Api
                 "/account/{accountId}",
                 async (context) =>
                     await context.GetIntegerRouteValue("accountId")
-                        .RunAsync(accountId => Db.DeleteAccount(appConfiguration.ConnectionString, new Account{ AccountId = accountId }))
-                        .Map((int _) => new AccountResponse())
+                        .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
+                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found"))
+                            .Bind(account => context.GetAuthenticatedLogin().AssertAccount(account))
+                        .RunAsync((Account account) => Db.DeleteAccount(
+                            appConfiguration.ConnectionString, 
+                            new Account{ AccountId = account.AccountId }))
+                        .Map(_ => new AccountResponse())
                 );
 
             routeBuilder.MapPostHandler<TransactionRequest, TransactionResponse>(
@@ -108,7 +113,8 @@ namespace TardisBank.Api
                 async (context, transactionRequest) =>
                     await context.GetIntegerRouteValue("accountId")
                         .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
-                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found"))
+                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found")
+                            .Bind(account => context.GetAuthenticatedLogin().AssertAccount(account)))
                         .MapAsync(account => Db.TransactionsByAccount(appConfiguration.ConnectionString, account)
                             .Map(transactions => transactions.FirstOrDefault() ?? new Transaction())
                             .Map(transaction => transactionRequest.ToModel(account, transaction, DateTimeOffset.Now)))
@@ -122,6 +128,7 @@ namespace TardisBank.Api
                     await context.GetIntegerRouteValue("accountId")
                         .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
                             .ToTardisResult(HttpStatusCode.NotFound, "Not Found"))
+                            .Bind(account => context.GetAuthenticatedLogin().AssertAccount(account))
                         .MapAsync(account => Db.TransactionsByAccount(appConfiguration.ConnectionString, account)
                         .Map(transactions => transactions.ToDto()))
                 );

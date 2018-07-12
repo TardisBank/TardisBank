@@ -23,12 +23,13 @@ namespace TardisBank.Api
         }
 
         public async static Task<Result<TSuccess, TFailure>> RunAsync<TSuccess, TFailure>(
-            this Result<TSuccess, TFailure> input, 
+            this Task<Result<TSuccess, TFailure>> input, 
             Func<TSuccess, Task> func)
         {
-            if(!input.IsSuccessful) return input;
-            await func(input.Success);
-            return input;
+            var awaitedInput = await input;
+            if(!awaitedInput.IsSuccessful) return awaitedInput;
+            await func(awaitedInput.Success);
+            return awaitedInput;
         }
 
         // Task
