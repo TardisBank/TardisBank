@@ -1,3 +1,4 @@
+using System;
 using E247.Fun;
 using TardisBank.Dto;
 
@@ -56,6 +57,25 @@ namespace TardisBank.Api
             }
 
             return accountRequest;
+        }
+
+        public static Result<ScheduleRequest, TardisFault> Validate(
+            this ScheduleRequest scheduleRequest)
+        {
+            if(scheduleRequest == null)
+            {
+                return new TardisFault("request body is missing");
+            }
+            if(scheduleRequest.Amount < 0)
+            {
+                return new TardisFault("Schedule amount can not be less than zero");
+            }
+            if(scheduleRequest.NextRun < DateTimeOffset.Now)
+            {
+                return new TardisFault("Next run cannot be in the past.");
+            }
+
+            return scheduleRequest;
         }
     }
 }

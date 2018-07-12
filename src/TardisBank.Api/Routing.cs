@@ -133,6 +133,43 @@ namespace TardisBank.Api
                         .Map(transactions => transactions.ToDto()))
                 );
 
+            routeBuilder.MapPostHandler<ScheduleRequest, ScheduleResponse>(
+                "/account/{accountId}/schedule",
+                async (context, scheduleRequest) =>
+                    await context.GetIntegerRouteValue("accountId")
+                        .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
+                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found")
+                            .Bind(account => context.GetAuthenticatedLogin().AssertAccount(account))
+                            .Bind(account => scheduleRequest.Validate().Map(sr => sr.ToModel(account))))
+                        .MapAsync(schedule => Db.InsertSchedule(appConfiguration.ConnectionString, schedule))
+                        .Map(schedule => schedule.ToDto())
+                );
+
+            routeBuilder.MapGetHandler<ScheduleResponseCollection>(
+                "/account/{accountId}/schedule",
+                async context => 
+                    await context.GetIntegerRouteValue("accountId")
+                        .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
+                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found"))
+                            .Bind(account => context.GetAuthenticatedLogin().AssertAccount(account))
+                        .MapAsync(account => Db.ScheduleByAccount(appConfiguration.ConnectionString, account)
+                        .Map(schedules => schedules.ToDto()))
+                );
+
+            routeBuilder.MapDeleteHandler<ScheduleResponse>(
+                "/account/{accountId}/schedule/{scheduleId}",
+                async (context) =>
+                    await context.GetIntegerRouteValue("accountId")
+                        .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
+                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found"))
+                            .Bind(account => context.GetAuthenticatedLogin().AssertAccount(account))
+                        .BindAsync<Account, TardisFault, int>(account => context.GetIntegerRouteValue("scheduleId")
+                            .RunAsync((int scheduleId) => Db.DeleteSchedule(
+                                appConfiguration.ConnectionString, 
+                                new Schedule { ScheduleId = scheduleId, AccountId = account.AccountId })))
+                        .Map(_ => new ScheduleResponse())
+                );
+
             return routeBuilder;
         }
     }

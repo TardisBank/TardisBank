@@ -164,7 +164,9 @@ namespace TardisBank.Api
         public static Task DeleteSchedule(string connectionString, Schedule schedule)
             => WithConnection(connectionString, async conn => 
             {
-                await conn.ExecuteAsync("DELETE FROM schedule WHERE schedule_id = @ScheduleId", schedule);
+                await conn.ExecuteAsync(
+                    "DELETE FROM schedule WHERE schedule_id = @ScheduleId AND account_id = @AccountId", 
+                    schedule);
             });
 
         private async static Task<T> WithConnection<T>(

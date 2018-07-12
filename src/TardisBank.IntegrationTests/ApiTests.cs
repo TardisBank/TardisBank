@@ -127,7 +127,7 @@ namespace TardisBank.IntegrationTests
 
             {
                 var result = await authenticatedClient.Get<AccountResponseCollection>(home.Link(Rels.Account));
-                Assert.Collection(result.Accounts);
+                Assert.Empty(result.Accounts);
             }
         }
 
@@ -162,6 +162,44 @@ namespace TardisBank.IntegrationTests
             Assert.Collection(transactions.Transactions,
                 x => Assert.Equal(transaction2.Amount, x.Amount),
                 x => Assert.Equal(transaction1.Amount, x.Amount));
+        }
+
+        [Fact]
+        public async Task PostGetAndDeleteSchedule()
+        {
+            var authenticatedClient = await RegisterAndLogin();
+            var home = await authenticatedClient.GetHome();
+
+            var account = new AccountRequest
+            {
+                AccountName = Guid.NewGuid().ToString()
+            };
+
+            var returnedAccount = await authenticatedClient.Post<AccountRequest, AccountResponse>(home.Link(Rels.Account), account);
+    
+            var schedule = new ScheduleRequest
+            {
+                TimePeriod = ScheduleTimePeriod.week,
+                NextRun = DateTimeOffset.Now.AddDays(1),
+                Amount = 3M
+            };
+
+            var returnedSchedule = await authenticatedClient.Post<ScheduleRequest, ScheduleResponse>(
+                returnedAccount.Link(Rels.Schedule), 
+                schedule);
+
+            Assert.Equal(schedule.TimePeriod, returnedSchedule.TimePeriod);
+            Assert.Equal(schedule.NextRun.Day, returnedSchedule.NextRun.Day);
+            Assert.Equal(schedule.Amount, returnedSchedule.Amount);
+
+            var schedules = await authenticatedClient.Get<ScheduleResponseCollection>(returnedAccount.Link(Rels.Schedule));
+            Assert.Collection(schedules.Schedules, 
+                x => Assert.Equal(returnedSchedule.Link(Rels.Self).Href, x.Link(Rels.Self).Href));
+
+            await authenticatedClient.Delete<ScheduleResponse>(returnedSchedule.Link(Rels.Self));
+
+            var schedulesAfterDeletion = await authenticatedClient.Get<ScheduleResponseCollection>(returnedAccount.Link(Rels.Schedule));
+            Assert.Empty(schedulesAfterDeletion.Schedules);
         }
 
         public async Task<ClientConfig> RegisterAndLogin(
