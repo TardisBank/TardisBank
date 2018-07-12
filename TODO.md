@@ -29,11 +29,11 @@
 
 - ~~List Transactions. GET children/child-id/transactions~~
 
-- Add Schedule POST children/child-id/schedule
+- ~~Add Schedule POST children/child-id/schedule~~
 
-- Delete Schedule DELETE children/child-id/schedule/schedule-id
+- ~~Delete Schedule DELETE children/child-id/schedule/schedule-id~~
 
-- List Schedules GET children/child-id/schedule
+- ~~List Schedules GET children/child-id/schedule~~
 
 - Run scheduler.
 
