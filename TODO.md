@@ -23,11 +23,11 @@
 
 - ~~Del Account.~~
 
-- Credit Transaction.
+- ~~Credit Transaction.~~
 
-- Debit Transaction.
+- ~~Debit Transaction.~~
 
-- List Transactions. GET children/child-id/transactions
+- ~~List Transactions. GET children/child-id/transactions~~
 
 - Add Schedule POST children/child-id/schedule
 

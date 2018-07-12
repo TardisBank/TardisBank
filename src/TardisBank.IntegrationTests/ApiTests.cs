@@ -35,7 +35,8 @@ namespace TardisBank.IntegrationTests
 
             Assert.NotNull(result);
             Assert.Collection(result.Links, 
-                x => Assert.Equal(Rels.Self, x.Rel));
+                x => Assert.Equal(Rels.Self, x.Rel),
+                x => Assert.Equal(Rels.Home, x.Rel));
         }
 
         [Fact]
@@ -70,6 +71,7 @@ namespace TardisBank.IntegrationTests
             var home = await authenticatedClient.GetHome();
 
             Assert.Collection(home.Links, 
+                x => Assert.Equal(Rels.Account, x.Rel),
                 x => Assert.Equal(Rels.Self, x.Rel),
                 x => Assert.Equal(Rels.Home, x.Rel));
 
@@ -127,6 +129,39 @@ namespace TardisBank.IntegrationTests
                 var result = await authenticatedClient.Get<AccountResponseCollection>(home.Link(Rels.Account));
                 Assert.Collection(result.Accounts);
             }
+        }
+
+        [Fact]
+        public async Task PostAndGetTransactionShouldWork()
+        {
+            var authenticatedClient = await RegisterAndLogin();
+            var home = await authenticatedClient.GetHome();
+
+            var account = new AccountRequest
+            {
+                AccountName = Guid.NewGuid().ToString()
+            };
+
+            var returnedAccount = await authenticatedClient.Post<AccountRequest, AccountResponse>(home.Link(Rels.Account), account);
+
+            var transaction1 = await authenticatedClient.Post<TransactionRequest, TransactionResponse>(
+                returnedAccount.Link(Rels.Transaction), new TransactionRequest { Amount = 1.45M });
+
+            var transaction2 = await authenticatedClient.Post<TransactionRequest, TransactionResponse>(
+                returnedAccount.Link(Rels.Transaction), new TransactionRequest { Amount = 2.78M });
+
+            Assert.Equal(1.45M, transaction1.Amount);
+            Assert.Equal(1.45M, transaction1.Balance);
+            Assert.Equal(DateTimeOffset.Now.Day, transaction1.TransactionDate.Day);
+            Assert.Equal(2.78M, transaction2.Amount);
+            Assert.Equal(2.78M + 1.45M, transaction2.Balance);
+
+            var transactions = await authenticatedClient.Get<TransactionResponseCollection>(
+                returnedAccount.Link(Rels.Transaction));
+            
+            Assert.Collection(transactions.Transactions,
+                x => Assert.Equal(transaction2.Amount, x.Amount),
+                x => Assert.Equal(transaction1.Amount, x.Amount));
         }
 
         public async Task<ClientConfig> RegisterAndLogin(
