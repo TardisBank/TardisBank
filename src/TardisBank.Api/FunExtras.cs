@@ -30,5 +30,12 @@ namespace TardisBank.Api
             await func(input.Success);
             return input;
         }
+
+        // Task
+        public async static Task<R> Map<T, R>(this Task<T> input, Func<T, R> func)
+        {
+            var awaitedInput = await input;
+            return func(awaitedInput);
+        }
     }
 }

@@ -82,11 +82,59 @@ namespace TardisBank.IntegrationTests
                     x => Assert.Equal(returnedAccount.AccountId, x.AccountId));
             }
 
+            {
+                var singleAccount = await Db.AccountById(connectionString, returnedAccount.AccountId);
+                Assert.True(singleAccount.HasValue);
+                Assert.Equal(returnedAccount.AccountId, singleAccount.Value.AccountId);
+            }
+
             await Db.DeleteAccount(connectionString, returnedAccount);
 
             {
                 var accounts = await Db.AccountByLogin(connectionString, returnedLogin);
-                Assert.Collection(accounts);
+                Assert.Empty(accounts);
+            }
+        }
+
+        [Fact]
+        public async Task ShouldBeAbleToInsertAndListTransactions()
+        {
+            var login = new Login
+            {
+                Email = $"{Guid.NewGuid().ToString()}@mailinator.com",
+                PasswordHash = Guid.NewGuid().ToString()
+            };
+
+            var returnedLogin = await Db.InsertLogin(connectionString, login);
+
+            var account = new Account
+            {
+                LoginId = returnedLogin.LoginId,
+                AccountName = Guid.NewGuid().ToString()
+            };
+
+            var returnedAccount = await Db.InsertAccount(connectionString, account);
+
+            var transaction = new Transaction
+            {
+                AccountId = returnedAccount.AccountId,
+                TransactionDate = DateTimeOffset.Now,
+                Amount = 2.40M,
+                Balance = 11.66M
+            };
+
+            var returnTransaction = await Db.InsertTransaction(connectionString, transaction);
+
+            Assert.Equal(transaction.AccountId, returnTransaction.AccountId);
+            Assert.Equal(transaction.TransactionDate.Minute, returnTransaction.TransactionDate.Minute);
+            Assert.Equal(transaction.Amount, returnTransaction.Amount);
+            Assert.Equal(transaction.Balance, returnTransaction.Balance);
+            Assert.True(returnTransaction.TransactionId > 0);
+
+            {
+                var transactions = await Db.TransactionsByAccount(connectionString, returnedAccount);
+                Assert.Collection(transactions, 
+                    x => Assert.Equal(returnTransaction.TransactionId, x.TransactionId));
             }
         }
     }

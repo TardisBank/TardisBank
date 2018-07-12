@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using E247.Fun;
@@ -33,6 +34,7 @@ namespace TardisBank.Api
                 AccountName = account.AccountName
             };
             accountResponse.AddLink(Rels.Self, $"/account/{account.AccountId}");
+            accountResponse.AddLink(Rels.Transaction, $"/account/{account.AccountId}/transaction");
             return accountResponse;
         }
 
@@ -40,6 +42,37 @@ namespace TardisBank.Api
             => new AccountResponseCollection
             {
                 Accounts = accounts.Select(x => x.ToDto()).ToArray()
+            };
+
+        public static Transaction ToModel(
+            this TransactionRequest transactionRequest,
+            Account account,
+            Transaction lastTransaction,
+            DateTimeOffset transactionDate)
+            => new Transaction
+            {
+                AccountId = account.AccountId,
+                TransactionDate = transactionDate,
+                Amount = transactionRequest.Amount
+            }.CalculateBalance(lastTransaction);
+
+        public static TransactionResponse ToDto(this Transaction transaction)
+        {
+            var transactionResponse = new TransactionResponse
+            {
+                TransactionDate = transaction.TransactionDate,
+                Amount = transaction.Amount,
+                Balance = transaction.Balance
+            };
+            transactionResponse.AddLink(Rels.Self, 
+                $"/account/{transaction.AccountId}/transaction/{transaction.TransactionId}");
+            return transactionResponse;
+        }
+
+        public static TransactionResponseCollection ToDto(this IEnumerable<Transaction> transactions)
+            => new TransactionResponseCollection
+            {
+                Transactions = transactions.Select(x => x.ToDto()).ToArray()
             };
     }
 }

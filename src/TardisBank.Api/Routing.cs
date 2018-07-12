@@ -103,6 +103,29 @@ namespace TardisBank.Api
                         .Map((int _) => new AccountResponse())
                 );
 
+            routeBuilder.MapPostHandler<TransactionRequest, TransactionResponse>(
+                "/account/{accountId}/transaction",
+                async (context, transactionRequest) =>
+                    await context.GetIntegerRouteValue("accountId")
+                        .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
+                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found"))
+                        .MapAsync(account => Db.TransactionsByAccount(appConfiguration.ConnectionString, account)
+                            .Map(transactions => transactions.FirstOrDefault() ?? new Transaction())
+                            .Map(transaction => transactionRequest.ToModel(account, transaction, DateTimeOffset.Now)))
+                        .MapAsync(transaction => Db.InsertTransaction(appConfiguration.ConnectionString, transaction))
+                        .Map(transaction => transaction.ToDto())
+                );
+
+            routeBuilder.MapGetHandler<TransactionResponseCollection>(
+                "/account/{accountId}/transaction",
+                async context => 
+                    await context.GetIntegerRouteValue("accountId")
+                        .BindAsync(accountId => Db.AccountById(appConfiguration.ConnectionString, accountId)
+                            .ToTardisResult(HttpStatusCode.NotFound, "Not Found"))
+                        .MapAsync(account => Db.TransactionsByAccount(appConfiguration.ConnectionString, account)
+                        .Map(transactions => transactions.ToDto()))
+                );
+
             return routeBuilder;
         }
     }

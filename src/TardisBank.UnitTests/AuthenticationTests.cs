@@ -14,7 +14,7 @@ namespace TardisBank.UnitTests
 {
     public class AuthenticationTests
     {
-        //[Fact]
+        [Fact(Skip = "Don't generate key file on each test run.")]
         public void GenerateKeyFile()
         {
             var encodedKey = GenerateKey();
@@ -131,7 +131,7 @@ namespace TardisBank.UnitTests
             Assert.False(context.Object.IsAuthenticated());
         }
 
-        private string GenerateKey()
+        private static string GenerateKey()
             => Convert.ToBase64String(new TripleDESCryptoServiceProvider().Key);
 
         private Login login = new Login
