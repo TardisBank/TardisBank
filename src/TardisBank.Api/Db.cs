@@ -81,6 +81,12 @@ namespace TardisBank.Api
                 return result;
             });
 
+        public static Task DeleteAccount(string connectionString, Account account)
+            => WithConnection(connectionString, async conn => 
+            {
+                await conn.ExecuteAsync("DELETE FROM account WHERE account_id = @AccountId", account);
+            });
+
         public static Task<Transaction> InsertTransaction(string connectionString, Transaction transaction)
             => WithConnection<Transaction>(connectionString, async conn => 
             {
@@ -116,10 +122,49 @@ namespace TardisBank.Api
                 return result;
             });
 
-        public static Task DeleteAccount(string connectionString, Account account)
+        public static Task<Schedule> InsertSchedule(string connectionString, Schedule schedule)
+            => WithConnection<Schedule>(connectionString, async conn => 
+            {
+                var result = await conn.QueryAsync<Schedule>(
+                    @"INSERT INTO schedule (account_id, time_period, next_run, amount)
+                    VALUES (@AccountId, @TimePeriod, @NextRun, @Amount)
+                    RETURNING
+                    schedule_id as ScheduleId,
+                    account_id as AccountId,
+                    time_period as TimePeriod,
+                    next_run as NextRun,
+                    amount as Amount", 
+                    new
+                    {
+                        schedule.ScheduleId,
+                        schedule.AccountId,
+                        TimePeriod = schedule.TimePeriod.ToString(),
+                        schedule.NextRun,
+                        schedule.Amount
+                    });
+                return result.Single();
+            });
+
+        public static Task<IEnumerable<Schedule>> ScheduleByAccount(string connectionString, Account account)
+            => WithConnection<IEnumerable<Schedule>>(connectionString, async conn => 
+            {
+                var result = await conn.QueryAsync<Schedule>(
+                    @"SELECT
+                    schedule_id as ScheduleId,
+                    account_id as AccountId,
+                    time_period as TimePeriod,
+                    next_run as NextRun,
+                    amount as Amount
+                    FROM schedule
+                    WHERE account_id = @AccountId", 
+                    account);
+                return result;
+            });
+
+        public static Task DeleteSchedule(string connectionString, Schedule schedule)
             => WithConnection(connectionString, async conn => 
             {
-                await conn.ExecuteAsync("DELETE FROM account WHERE account_id = @AccountId", account);
+                await conn.ExecuteAsync("DELETE FROM schedule WHERE schedule_id = @ScheduleId", schedule);
             });
 
         private async static Task<T> WithConnection<T>(

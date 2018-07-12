@@ -51,15 +51,17 @@ namespace TardisBank.Api
     public class Schedule
     {
         public int ScheduleId { get; set; }
+        public int AccountId { get; set; }
         public TimePeriod TimePeriod { get; set; }
         public DateTimeOffset NextRun { get; set; }
+        public decimal Amount { get; set;}
     }
 
     public enum TimePeriod
     {
-        Day,
-        Week,
-        Month
+        day,
+        week,
+        month
     }
 
     public class Token

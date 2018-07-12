@@ -24,5 +24,6 @@ CREATE TABLE schedule (
 	schedule_id integer generated always AS IDENTITY primary key,
 	account_id integer REFERENCES account (account_id),
 	time_period text NOT NULL CHECK (time_period IN ('day', 'week', 'month')),
-	next_run date NOT NULL
+	next_run date NOT NULL,
+	amount money NOT NULL
 );

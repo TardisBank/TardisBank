@@ -137,5 +137,49 @@ namespace TardisBank.IntegrationTests
                     x => Assert.Equal(returnTransaction.TransactionId, x.TransactionId));
             }
         }
+
+        [Fact]
+        public async Task ShouldBeAbleToInsertListAndDeleteSchedules()
+        {
+            var login = new Login
+            {
+                Email = $"{Guid.NewGuid().ToString()}@mailinator.com",
+                PasswordHash = Guid.NewGuid().ToString()
+            };
+
+            var returnedLogin = await Db.InsertLogin(connectionString, login);
+
+            var account = new Account
+            {
+                LoginId = returnedLogin.LoginId,
+                AccountName = Guid.NewGuid().ToString()
+            };
+
+            var returnedAccount = await Db.InsertAccount(connectionString, account);
+
+            var schedule = new Schedule
+            {
+                AccountId = returnedAccount.AccountId,
+                TimePeriod = TimePeriod.week,
+                NextRun = DateTimeOffset.Now,
+                Amount = 3.0M
+            };
+
+            var returnedSchedule = await Db.InsertSchedule(connectionString, schedule);
+
+            Assert.Equal(schedule.AccountId, returnedSchedule.AccountId);
+            Assert.Equal(schedule.TimePeriod, returnedSchedule.TimePeriod);
+            Assert.Equal(schedule.NextRun.Day, returnedSchedule.NextRun.Day);
+            Assert.Equal(schedule.Amount, returnedSchedule.Amount);
+            Assert.True(returnedSchedule.ScheduleId > 0);
+
+            var schedules = await Db.ScheduleByAccount(connectionString, returnedAccount);
+            Assert.Collection(schedules, x => Assert.Equal(returnedSchedule.ScheduleId, x.ScheduleId));
+
+            await Db.DeleteSchedule(connectionString, returnedSchedule);
+
+            var schedulesAfterDeletion = await Db.ScheduleByAccount(connectionString, returnedAccount);
+            Assert.Empty(schedulesAfterDeletion);
+        }
     }
 }
