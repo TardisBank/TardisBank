@@ -21,7 +21,7 @@
 
 - ~~List Accouts. GET children/~~
 
-- Del Account.
+- ~~Del Account.~~
 
 - Credit Transaction.
 

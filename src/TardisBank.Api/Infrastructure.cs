@@ -132,5 +132,15 @@ namespace TardisBank.Api
 
         public static string ErrorResponse(string message)
             => $"{{ \"Message\": \"{message}\" }}";
+
+        public static Result<int, TardisFault> GetIntegerRouteValue(this HttpContext context, string key)
+        {
+            var value = context.GetRouteValue(key) as string;
+            if(value != null && int.TryParse(value, out int intValue))
+            {
+                return intValue;
+            }
+            return new TardisFault(HttpStatusCode.NotFound, $"Not Found");
+        }
     }
 }

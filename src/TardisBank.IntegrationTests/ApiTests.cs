@@ -110,15 +110,22 @@ namespace TardisBank.IntegrationTests
                 AccountName = Guid.NewGuid().ToString()
             };
 
-            {
-                var result = await authenticatedClient.Post<AccountRequest, AccountResponse>(home.Link(Rels.Account), account);
-                Assert.Equal(account.AccountName, result.AccountName);
-            }
+            var returnedAccount = await authenticatedClient.Post<AccountRequest, AccountResponse>(home.Link(Rels.Account), account);
+            Assert.Equal(account.AccountName, returnedAccount.AccountName);
 
             {
                 var result = await authenticatedClient.Get<AccountResponseCollection>(home.Link(Rels.Account));
                 Assert.Collection(result.Accounts, 
                     x => Assert.Equal(account.AccountName, x.AccountName));
+            }
+
+            {
+                var result = await authenticatedClient.Delete<AccountResponse>(returnedAccount.Link(Rels.Self));
+            }
+
+            {
+                var result = await authenticatedClient.Get<AccountResponseCollection>(home.Link(Rels.Account));
+                Assert.Collection(result.Accounts);
             }
         }
 

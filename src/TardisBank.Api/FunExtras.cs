@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Threading.Tasks;
 using E247.Fun;
@@ -19,6 +20,15 @@ namespace TardisBank.Api
         {
             var maybe = await asyncMaybe;
             return maybe.ToTardisResult(message);
+        }
+
+        public async static Task<Result<TSuccess, TFailure>> RunAsync<TSuccess, TFailure>(
+            this Result<TSuccess, TFailure> input, 
+            Func<TSuccess, Task> func)
+        {
+            if(!input.IsSuccessful) return input;
+            await func(input.Success);
+            return input;
         }
     }
 }

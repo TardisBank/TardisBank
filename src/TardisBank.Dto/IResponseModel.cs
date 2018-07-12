@@ -16,6 +16,7 @@ namespace TardisBank.Dto
 
         public void AddLink(string rel, string href)
         {
+            if(links.Any(x => x.Rel == rel)) return;
             links.Add(new LinkModel
             {
                 Rel = rel,

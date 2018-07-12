@@ -27,10 +27,14 @@ namespace TardisBank.Api
             };
 
         public static AccountResponse ToDto(this Account account)
-            => new AccountResponse
+        {
+            var accountResponse = new AccountResponse
             {
                 AccountName = account.AccountName
             };
+            accountResponse.AddLink(Rels.Self, $"/account/{account.AccountId}");
+            return accountResponse;
+        }
 
         public static AccountResponseCollection ToDto(this IEnumerable<Account> accounts)
             => new AccountResponseCollection

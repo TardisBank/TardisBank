@@ -95,6 +95,14 @@ namespace TardisBank.Api
                         .Map((IEnumerable<Account> accounts) => accounts.ToDto())
                 );
 
+            routeBuilder.MapDeleteHandler<AccountResponse>(
+                "/account/{accountId}",
+                async (context) =>
+                    await context.GetIntegerRouteValue("accountId")
+                        .RunAsync(accountId => Db.DeleteAccount(appConfiguration.ConnectionString, new Account{ AccountId = accountId }))
+                        .Map((int _) => new AccountResponse())
+                );
+
             return routeBuilder;
         }
     }
