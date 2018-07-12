@@ -14,7 +14,7 @@ namespace TardisBank.UnitTests
 {
     public class AuthenticationTests
     {
-        [Fact]
+        //[Fact]
         public void GenerateKeyFile()
         {
             var encodedKey = GenerateKey();
