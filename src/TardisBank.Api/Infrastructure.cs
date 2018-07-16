@@ -131,7 +131,10 @@ namespace TardisBank.Api
         }
 
         public static string ErrorResponse(string message)
-            => $"{{ \"Message\": \"{message}\" }}";
+            => JsonConvert.SerializeObject(new ErrorResponse
+            {
+                Message = message
+            });
 
         public static Result<int, TardisFault> GetIntegerRouteValue(this HttpContext context, string key)
         {
@@ -140,7 +143,7 @@ namespace TardisBank.Api
             {
                 return intValue;
             }
-            return new TardisFault(HttpStatusCode.NotFound, $"Not Found");
+            return new TardisFault(HttpStatusCode.NotFound, "Not Found");
         }
     }
 }

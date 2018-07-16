@@ -7,6 +7,7 @@ using E247.Fun;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using TardisBank.Dto;
 
 namespace TardisBank.Api
 {
@@ -123,7 +124,11 @@ namespace TardisBank.Api
                 else
                 {
                     context.Response.StatusCode = 401;
-                    await context.Response.WriteAsync("{ \"Message\": \"Authentication Failed\" }");
+                    var json = JsonConvert.SerializeObject(new ErrorResponse 
+                    {
+                        Message = "Forbidden"
+                    });
+                    await context.Response.WriteAsync(json);
                 }
             };
         }

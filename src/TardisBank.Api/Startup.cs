@@ -17,10 +17,7 @@ namespace TardisBank.Api
         {
             var appConfiguration = AppConfiguration.LoadFromEnvironment();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseErrorHandler(env.IsDevelopment());
 
             app.Use(Authentication.Authenticate(
                 token => Authentication.DecryptToken(

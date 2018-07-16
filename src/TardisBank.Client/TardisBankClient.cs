@@ -60,6 +60,10 @@ namespace TardisBank.Client
 
             var response = await config.HttpClient.SendAsync(request);
             var responseBody = await response.Content.ReadAsStringAsync();
+            if((int)response.StatusCode >= 400)
+            {
+                throw new ApplicationException($"Request {requestUri.ToString()}, Status code: {response.StatusCode}, '{responseBody}'");
+            }
 
             return JsonConvert.DeserializeObject<T>(responseBody);
         }
