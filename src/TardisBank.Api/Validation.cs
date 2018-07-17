@@ -11,7 +11,7 @@ namespace TardisBank.Api
         {
             if(registerRequest == null)
             {
-                return new TardisFault("request body missing");
+                return new TardisFault("Request body missing");
             }
             if(string.IsNullOrEmpty(registerRequest.Email))
             {
@@ -30,7 +30,7 @@ namespace TardisBank.Api
         {
             if(loginRequest == null)
             {
-                return new TardisFault("request body missing");
+                return new TardisFault("Request body missing");
             }
             if(string.IsNullOrEmpty(loginRequest.Email))
             {
@@ -49,7 +49,7 @@ namespace TardisBank.Api
         {
             if(accountRequest == null)
             {
-                return new TardisFault("request body missing");
+                return new TardisFault("Request body missing");
             }
             if(string.IsNullOrEmpty(accountRequest.AccountName))
             {
@@ -64,7 +64,7 @@ namespace TardisBank.Api
         {
             if(scheduleRequest == null)
             {
-                return new TardisFault("request body is missing");
+                return new TardisFault("Request body is missing");
             }
             if(scheduleRequest.Amount < 0)
             {
@@ -76,6 +76,27 @@ namespace TardisBank.Api
             }
 
             return scheduleRequest;
+        }
+
+        public static Result<ChangePasswordRequest, TardisFault> Validate(
+            this ChangePasswordRequest changePasswordRequest)
+        {
+            if(changePasswordRequest == null)
+            {
+                return new TardisFault("Request body is missing");
+            }
+
+            if(string.IsNullOrEmpty(changePasswordRequest.OldPassword))
+            {
+                return new TardisFault("OldPassword is missing");
+            }
+
+            if(string.IsNullOrEmpty(changePasswordRequest.NewPassword))
+            {
+                return new TardisFault("NewPassword is missing");
+            }
+
+            return changePasswordRequest;
         }
     }
 }

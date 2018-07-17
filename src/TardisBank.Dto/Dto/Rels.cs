@@ -8,5 +8,6 @@ namespace TardisBank.Dto
         public const string Account = "account";
         public const string Transaction = "transaction";
         public const string Schedule = "schedule";
+        public const string Password = "password";
     }
 }

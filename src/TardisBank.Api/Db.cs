@@ -23,6 +23,32 @@ namespace TardisBank.Api
                 return result.Single();
             });
 
+        public static Task UpdateLoginPassword(string connectionString, int loginId, string newPasswordHash)
+            => WithConnection(connectionString, async conn =>
+            {
+                var result = await conn.QueryAsync<Login>(
+                    "UPDATE login SET password_hash = @NewPasswordHash WHERE login_id = @LoginId",
+                    new { LoginId = loginId, NewPasswordHash = newPasswordHash });
+            });
+
+        public static Task<Login> LoginById(string connectionString, int loginId)
+            => WithConnection<Login>(connectionString, 
+            async conn =>
+            {
+                var result = await conn.QueryAsync<Login>(
+                    "SELECT login_id as LoginId, email as Email, password_hash as PasswordHash " + 
+                    "FROM login WHERE login_id = @LoginId",
+                    new { LoginId = loginId });
+
+                if(result.Any())
+                {
+                    return result.Single();
+                }
+                // throw rather than returning Maybe<Login>. Any id based lookup
+                // should succeed, so this a server fault and should be thrown.
+                throw new ApplicationException("LoginId not found in DB.");
+            });
+
         public static Task<Maybe<Login>> LoginByEmail(string connectionString, string email)
             => WithConnection<Maybe<Login>>(connectionString, 
             async conn =>

@@ -33,6 +33,14 @@ namespace TardisBank.Client
             return config.Send<TResponse>(link, HttpMethod.Post, requestBody);
         }
 
+        public static Task<TResponse> Put<TRequest, TResponse>(this ClientConfig config, LinkModel link, TRequest request)
+        {
+            if(request == null) throw new ArgumentNullException(nameof(request));
+
+            var requestBody = JsonConvert.SerializeObject(request);
+            return config.Send<TResponse>(link, HttpMethod.Put, requestBody);
+        }
+
         public static async Task<T> Send<T>(
             this ClientConfig config, 
             LinkModel link, 

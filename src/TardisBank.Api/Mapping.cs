@@ -135,5 +135,12 @@ namespace TardisBank.Api
             {
                 Schedules = schedules.Select(x => x.ToDto()).ToArray()
             };
+
+        public static PasswordChange ToModel(this ChangePasswordRequest changePasswordRequest)
+            => new PasswordChange
+            {
+                OldPassword = changePasswordRequest.OldPassword,
+                NewPasswordHash = Password.HashPassword(changePasswordRequest.NewPassword)
+            };
     }
 }

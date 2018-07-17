@@ -69,4 +69,20 @@ namespace TardisBank.Api
         public Login Login { get; set; }
         public DateTimeOffset Expires { get; set; }
     }
+
+    public class PasswordChange
+    {
+        public string OldPassword { get; set; }
+        public string NewPasswordHash { get; set; }
+    }
+
+    public static class PasswordChangeExtensions
+    {
+        public static Result<PasswordChange, TardisFault> AssertOldPasswordMatches(
+            this PasswordChange passwordChange, 
+            Login login)
+            => Password.HashMatches(passwordChange.OldPassword, login.PasswordHash)
+            ? (Result<PasswordChange, TardisFault>) passwordChange
+            : new TardisFault("Old password is incorrect.");
+    }
 }

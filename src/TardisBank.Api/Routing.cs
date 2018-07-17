@@ -26,6 +26,7 @@ namespace TardisBank.Api
                             { 
                                 response.Email = login.Email;
                                 response.AddLink(Rels.Account, "/account");
+                                response.AddLink(Rels.Password, "/password");
                             },
                             None: () => response.AddLink(Rels.Login, "/login")
                         );
@@ -73,6 +74,21 @@ namespace TardisBank.Api
                         .Map(login => Authentication.CreateToken(appConfiguration.EncryptionKey, () => DateTimeOffset.Now, login))
                         .Map(token => new LoginResponse { Token = token }),
                 authenticated: false);
+
+            routeBuilder.MapPutHandler<ChangePasswordRequest, ChangePasswordResponse>(
+                "/password",
+                async (context, changePasswordRequest) =>
+                    await changePasswordRequest.Validate()
+                        .Map(dto => dto.ToModel())
+                        .BindAsync((PasswordChange model) => context.GetAuthenticatedLogin()
+                            .AssertLogin()
+                            .MapAsync((Login login) => Db.LoginById(appConfiguration.ConnectionString, login.LoginId))
+                            .BindAsync(login => model.AssertOldPasswordMatches(login)
+                                .RunAsync(m => Db.UpdateLoginPassword(appConfiguration.ConnectionString, login.LoginId, m.NewPasswordHash))
+                            )
+                        )
+                        .Map((PasswordChange _) => new ChangePasswordResponse())
+                );
 
             routeBuilder.MapPostHandler<AccountRequest, AccountResponse>(
                 "/account",

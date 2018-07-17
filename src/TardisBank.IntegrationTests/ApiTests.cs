@@ -98,6 +98,43 @@ namespace TardisBank.IntegrationTests
                 Password = password
             };
 
+            try
+            {
+                var loginResult = await client.Post<LoginRequest, LoginResponse>(unauthenticatedHome.Link(Rels.Login), login);
+                Assert.True(false, "Expected an ApplicationExcetion to be thrown");
+            }
+            catch(ApplicationException exception)
+            {
+                if(!exception.Message.Contains("Unknown Email or Password.")) throw;
+            }
+        }
+
+        [Fact]
+        public async Task ChangePasswordShouldWork()
+        {
+            var email = $"{Guid.NewGuid().ToString()}@mailinator.com";
+            var password = Guid.NewGuid().ToString();
+
+            var authenticatedClient = await RegisterAndLogin(email, password);
+            var home = await authenticatedClient.GetHome();
+
+            var changePassword = new ChangePasswordRequest
+            {
+                OldPassword = password,
+                NewPassword = Guid.NewGuid().ToString()
+            };
+
+            var result = await authenticatedClient.Put<ChangePasswordRequest, ChangePasswordResponse>(home.Link(Rels.Password), changePassword);
+
+            var unauthenticatedHome = await client.GetHome();
+
+            // attempt to login...
+            var login = new LoginRequest
+            {
+                Email = email,
+                Password = changePassword.NewPassword
+            };
+
             var loginResult = await client.Post<LoginRequest, LoginResponse>(unauthenticatedHome.Link(Rels.Login), login);
         }
 

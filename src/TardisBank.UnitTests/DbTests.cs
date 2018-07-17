@@ -54,6 +54,26 @@ namespace TardisBank.IntegrationTests
         }
 
         [Fact]
+        public async Task ShouldBeAbleToUpdatePassword()
+        {
+            var login = new Login
+            {
+                Email = $"{Guid.NewGuid().ToString()}@mailinator.com",
+                PasswordHash = Guid.NewGuid().ToString()
+            };
+
+            await Db.InsertLogin(connectionString, login);
+            var result = await Db.LoginByEmail(connectionString, login.Email);
+
+            var newPasswordHash = Guid.NewGuid().ToString();
+            await Db.UpdateLoginPassword(connectionString, result.Value.LoginId, newPasswordHash);
+
+            var loginByIdResult = await Db.LoginById(connectionString, result.Value.LoginId);
+
+            Assert.Equal(newPasswordHash, loginByIdResult.PasswordHash);
+        }
+
+        [Fact]
         public async Task ShouldBeAbleToInsertSelectAndDeleteAccount()
         {
             var login = new Login
