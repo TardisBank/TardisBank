@@ -85,4 +85,11 @@ namespace TardisBank.Api
             ? (Result<PasswordChange, TardisFault>) passwordChange
             : new TardisFault("Old password is incorrect.");
     }
+
+    public class EmailMessage
+    {
+        public string ToAddress { get; set; }
+        public string Subject { get; set; }
+        public string Body { get; set; }
+    }
 }
