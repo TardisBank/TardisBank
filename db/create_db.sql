@@ -1,7 +1,8 @@
 CREATE TABLE login (
 	login_id integer generated always AS IDENTITY primary key,
 	email text UNIQUE NOT NULL,
-	password_hash text NOT NULL
+	password_hash text NOT NULL,
+	verified boolean NOT NULL
 );
 
 CREATE INDEX login_email_index ON login (email);
