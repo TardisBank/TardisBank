@@ -41,11 +41,24 @@ namespace TardisBank.Api
             return input;
         }
 
+        public async static Task<Result<TSuccess, TFailure>> Run<TSuccess, TFailure>(
+            this Task<Result<TSuccess, TFailure>> input, 
+            Action<TSuccess> func)
+        {
+            var awaitedInput = await input;
+            if(!awaitedInput.IsSuccessful) return awaitedInput;
+            func(awaitedInput.Success);
+            return awaitedInput;
+        }
+
         // Task
         public async static Task<R> Map<T, R>(this Task<T> input, Func<T, R> func)
         {
             var awaitedInput = await input;
             return func(awaitedInput);
         }
+
+        public static R Pipe<T, R>(this T input, Func<T, R> func)
+            => func(input);
     }
 }

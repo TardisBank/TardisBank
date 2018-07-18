@@ -8,6 +8,7 @@ using System;
 using static E247.Fun.Result<TardisBank.Api.Login, TardisBank.Api.TardisFault>;
 using System.Net;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace TardisBank.Api
 {
@@ -59,6 +60,10 @@ namespace TardisBank.Api
                         )
                         .Map(dto => dto.ToModel())
                         .MapAsync(login => Db.InsertLogin(appConfiguration.ConnectionString, login))
+                        .Run((Login login) => Authentication.CreateToken(appConfiguration.EncryptionKey, () => DateTimeOffset.Now, login, TokenType.Verification)
+                            .Pipe(token => login.CreateVerificationEmail(token, context.Request)
+                            .Tee(emailMessage => Email.Send(appConfiguration.GetEmailConfiguration(), emailMessage)))
+                        )
                         .Map(login => login.ToDto()),
                 authenticated: false);
 

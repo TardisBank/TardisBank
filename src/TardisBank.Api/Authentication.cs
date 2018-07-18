@@ -15,7 +15,11 @@ namespace TardisBank.Api
     {
         private static readonly TimeSpan tokenPeriod = TimeSpan.FromHours(1);
 
-        public static string CreateToken(string encryptionKey, Func<DateTimeOffset> now, Login login)
+        public static string CreateToken(
+            string encryptionKey, 
+            Func<DateTimeOffset> now, 
+            Login login, 
+            TokenType tokenType = TokenType.Login)
         {
             if(encryptionKey == null) throw new ArgumentNullException(encryptionKey);
             if(login == null) throw new ArgumentNullException(nameof(login));
@@ -32,7 +36,8 @@ namespace TardisBank.Api
                         LoginId = login.LoginId,
                         PasswordHash = string.Empty
                     },
-                    Expires = now()
+                    Expires = now().Add(tokenPeriod),
+                    TokenType = tokenType
                 }));
 
             var encriptor = tes.CreateEncryptor();
@@ -44,7 +49,11 @@ namespace TardisBank.Api
             return $"{resultBase64}:{iv}";
         }
 
-        public static Maybe<Login> DecryptToken(string encryptionKey, Func<DateTimeOffset> now, string token)
+        public static Maybe<Login> DecryptToken(
+            string encryptionKey, 
+            Func<DateTimeOffset> now, 
+            string token,
+            TokenType tokenType = TokenType.Login)
         {
             if(encryptionKey == null) throw new ArgumentNullException(encryptionKey);
             if(token == null) throw new ArgumentNullException(nameof(token));
@@ -75,7 +84,7 @@ namespace TardisBank.Api
             }
 
             var tokenModel = JsonConvert.DeserializeObject<Token>(json);
-            if(tokenModel.Expires.Add(tokenPeriod) < now())
+            if(tokenModel.Expires < now() || tokenModel.TokenType != tokenType)
             {
                 return loginNothing;
             }

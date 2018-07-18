@@ -15,8 +15,8 @@ namespace TardisBank.Api
             => WithConnection(connectionString, async conn =>
             {
                 var result = await conn.QueryAsync<Login>(
-                    "INSERT INTO login (email, password_hash) " + 
-                    "VALUES (@Email, @PasswordHash) " + 
+                    "INSERT INTO login (email, password_hash, verified) " + 
+                    "VALUES (@Email, @PasswordHash, FALSE) " + 
                     "RETURNING login_id as LoginId, email as Email, password_hash as PasswordHash",
                     login);
 
@@ -55,7 +55,7 @@ namespace TardisBank.Api
             {
                 var result = await conn.QueryAsync<Login>(
                     "SELECT login_id as LoginId, email as Email, password_hash as PasswordHash " + 
-                    "FROM login WHERE email = @Email",
+                    "FROM login WHERE email = @Email AND verified",
                     new { Email = email });
 
                 if(result.Any())
