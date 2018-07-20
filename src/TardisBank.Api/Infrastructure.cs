@@ -145,5 +145,15 @@ namespace TardisBank.Api
             }
             return new TardisFault(HttpStatusCode.NotFound, "Not Found");
         }
+
+        public static Result<string, TardisFault> GetStringRouteValue(this HttpContext context, string key)
+        {
+            var value = context.GetRouteValue(key) as string;
+            if(string.IsNullOrEmpty(value))
+            {
+                return new TardisFault(HttpStatusCode.NotFound, "Not Found");
+            }
+            return value;
+        }
     }
 }

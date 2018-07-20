@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Web;
 using E247.Fun;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -29,17 +30,17 @@ namespace TardisBank.Api
 
         public static EmailMessage CreateVerificationEmail(this Login login, string token, HttpRequest request)
         {
-            var uri = new Uri(UriHelper.BuildAbsolute(
+            var uri = UriHelper.BuildAbsolute(
                 request.Scheme,
                 request.Host,
                 request.PathBase,
                 new PathString("/verify").Add(new PathString($"/{token}"))
-            ));
+            );
             return new EmailMessage
             {
                 ToAddress = login.Email,
                 Subject = "Please verify your Tardis Bank account",
-                Body = $"Please click on this link or copy into browser: {UriHelper.Encode(uri)}"
+                Body = $"Please click on this link or copy into browser: {uri}"
             };
         }
     }

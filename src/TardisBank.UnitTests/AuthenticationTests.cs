@@ -4,8 +4,10 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using E247.Fun;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Moq;
 using TardisBank.Api;
 using Xunit;
@@ -87,7 +89,11 @@ namespace TardisBank.UnitTests
             request.Setup(x => x.Headers).Returns(headers);
 
             headers.Add("Authorization", "Bearer my-token");
-            var expectedLogin = new Login();
+            var expectedLogin = new Login 
+            {
+                LoginId = 12,
+                Email = "bob@email.com"
+            };
             bool nextWasCalled = false;
             Func<Task> next = () => 
             {

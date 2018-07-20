@@ -31,6 +31,14 @@ namespace TardisBank.Api
                     new { LoginId = loginId, NewPasswordHash = newPasswordHash });
             });
 
+        public static Task UpdateLoginSetVerified(string connectionString, int loginId)
+            => WithConnection(connectionString, async conn =>
+            {
+                var result = await conn.QueryAsync<Login>(
+                    "UPDATE login SET verified = TRUE WHERE login_id = @LoginId",
+                    new { LoginId = loginId });
+            });
+
         public static Task<Login> LoginById(string connectionString, int loginId)
             => WithConnection<Login>(connectionString, 
             async conn =>

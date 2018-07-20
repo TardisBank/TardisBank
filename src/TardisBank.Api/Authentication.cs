@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using TardisBank.Dto;
+using System.Web;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TardisBank.Api
 {
@@ -42,8 +44,8 @@ namespace TardisBank.Api
 
             var encriptor = tes.CreateEncryptor();
             var resultBytes = encriptor.TransformFinalBlock(jsonBytes, 0, jsonBytes.Length);
-            var resultBase64 = Convert.ToBase64String(resultBytes);
-            var iv = Convert.ToBase64String(tes.IV);
+            var resultBase64 = Base64UrlEncoder.Encode(resultBytes);
+            var iv = Base64UrlEncoder.Encode(tes.IV);
             tes.Clear();
 
             return $"{resultBase64}:{iv}";
@@ -64,8 +66,8 @@ namespace TardisBank.Api
                 return loginNothing;
             }
 
-            var encodedBytes = Convert.FromBase64String(tokenParts[0]);
-            var iv = Convert.FromBase64String(tokenParts[1]);
+            byte[] encodedBytes = Base64UrlEncoder.DecodeBytes(tokenParts[0]);
+            var iv = Base64UrlEncoder.DecodeBytes(tokenParts[1]);
 
             var tes = new TripleDESCryptoServiceProvider();
             tes.Key = Convert.FromBase64String(encryptionKey);

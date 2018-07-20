@@ -50,6 +50,7 @@ namespace TardisBank.IntegrationTests
             };
 
             var registrationResult = await client.Post<RegisterRequest, RegisterResponse>(home.Link(Rels.Home), registration);
+            DbHelper.UpdateEmailVerified(registration.Email);
 
             var login = new LoginRequest
             {
@@ -251,6 +252,7 @@ namespace TardisBank.IntegrationTests
             };
 
             var registrationResult = await client.Post<RegisterRequest, RegisterResponse>(home.Link(Rels.Home), registration);
+            DbHelper.UpdateEmailVerified(registration.Email);
 
             var login = new LoginRequest
             {

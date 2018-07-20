@@ -9,6 +9,7 @@ using static E247.Fun.Result<TardisBank.Api.Login, TardisBank.Api.TardisFault>;
 using System.Net;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http.Extensions;
+using System.Web;
 
 namespace TardisBank.Api
 {
@@ -66,6 +67,25 @@ namespace TardisBank.Api
                         )
                         .Map(login => login.ToDto()),
                 authenticated: false);
+
+            routeBuilder.MapGetHandler<HomeResponse>(
+                "/verify/{token}",
+                async context => 
+                    await context.GetStringRouteValue("token")
+                        .Bind(token => Authentication.DecryptToken(
+                            appConfiguration.EncryptionKey, 
+                            () => DateTimeOffset.Now, 
+                            token, 
+                            TokenType.Verification)
+                            .AssertLogin())
+                        .RunAsync(login => Db.UpdateLoginSetVerified(appConfiguration.ConnectionString, login.LoginId))
+                        .Map(_ => 
+                        {
+                            var response = new HomeResponse();
+                            response.AddLink(Rels.Login, "/login");
+                            return response;
+                        }),
+                authenticated: false); 
 
             routeBuilder.MapPostHandler<LoginRequest, LoginResponse>(
                 "/login", 
