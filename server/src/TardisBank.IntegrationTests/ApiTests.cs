@@ -1,6 +1,8 @@
 using System;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Npgsql;
 using TardisBank.Client;
 using TardisBank.Dto;
 using Xunit;
@@ -9,7 +11,7 @@ namespace TardisBank.IntegrationTests
 {
     public class ApiTests
     {
-        const string baseUri = "http://localhost.fiddler:5000/";
+        const string baseUri = "http://localhost:5000/";
         private ClientConfig client = new ClientConfig(new Uri(baseUri), new HttpClient());
 
         [Fact]
@@ -17,7 +19,7 @@ namespace TardisBank.IntegrationTests
         {
             var result = await client.GetHome();
 
-            Assert.Collection(result.Links, 
+            Assert.Collection(result.Links,
                 x => Assert.Equal(Rels.Login, x.Rel),
                 x => Assert.Equal(Rels.Self, x.Rel),
                 x => Assert.Equal(Rels.Home, x.Rel));
@@ -34,7 +36,7 @@ namespace TardisBank.IntegrationTests
             });
 
             Assert.NotNull(result);
-            Assert.Collection(result.Links, 
+            Assert.Collection(result.Links,
                 x => Assert.Equal(Rels.Self, x.Rel),
                 x => Assert.Equal(Rels.Home, x.Rel));
         }
@@ -71,7 +73,7 @@ namespace TardisBank.IntegrationTests
 
             var home = await authenticatedClient.GetHome();
 
-            Assert.Collection(home.Links, 
+            Assert.Collection(home.Links,
                 x => Assert.Equal(Rels.Account, x.Rel),
                 x => Assert.Equal(Rels.Self, x.Rel),
                 x => Assert.Equal(Rels.Home, x.Rel));
@@ -104,9 +106,9 @@ namespace TardisBank.IntegrationTests
                 var loginResult = await client.Post<LoginRequest, LoginResponse>(unauthenticatedHome.Link(Rels.Login), login);
                 Assert.True(false, "Expected an ApplicationExcetion to be thrown");
             }
-            catch(ApplicationException exception)
+            catch (ApplicationException exception)
             {
-                if(!exception.Message.Contains("Unknown Email or Password.")) throw;
+                if (!exception.Message.Contains("Unknown Email or Password.")) throw;
             }
         }
 
@@ -155,7 +157,7 @@ namespace TardisBank.IntegrationTests
 
             {
                 var result = await authenticatedClient.Get<AccountResponseCollection>(home.Link(Rels.Account));
-                Assert.Collection(result.Accounts, 
+                Assert.Collection(result.Accounts,
                     x => Assert.Equal(account.AccountName, x.AccountName));
             }
 
@@ -196,7 +198,7 @@ namespace TardisBank.IntegrationTests
 
             var transactions = await authenticatedClient.Get<TransactionResponseCollection>(
                 returnedAccount.Link(Rels.Transaction));
-            
+
             Assert.Collection(transactions.Transactions,
                 x => Assert.Equal(transaction2.Amount, x.Amount),
                 x => Assert.Equal(transaction1.Amount, x.Amount));
@@ -214,7 +216,7 @@ namespace TardisBank.IntegrationTests
             };
 
             var returnedAccount = await authenticatedClient.Post<AccountRequest, AccountResponse>(home.Link(Rels.Account), account);
-    
+
             var schedule = new ScheduleRequest
             {
                 TimePeriod = ScheduleTimePeriod.week,
@@ -223,7 +225,7 @@ namespace TardisBank.IntegrationTests
             };
 
             var returnedSchedule = await authenticatedClient.Post<ScheduleRequest, ScheduleResponse>(
-                returnedAccount.Link(Rels.Schedule), 
+                returnedAccount.Link(Rels.Schedule),
                 schedule);
 
             Assert.Equal(schedule.TimePeriod, returnedSchedule.TimePeriod);
@@ -231,7 +233,7 @@ namespace TardisBank.IntegrationTests
             Assert.Equal(schedule.Amount, returnedSchedule.Amount);
 
             var schedules = await authenticatedClient.Get<ScheduleResponseCollection>(returnedAccount.Link(Rels.Schedule));
-            Assert.Collection(schedules.Schedules, 
+            Assert.Collection(schedules.Schedules,
                 x => Assert.Equal(returnedSchedule.Link(Rels.Self).Href, x.Link(Rels.Self).Href));
 
             await authenticatedClient.Delete<ScheduleResponse>(returnedSchedule.Link(Rels.Self));
