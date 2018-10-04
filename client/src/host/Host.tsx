@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { Login } from '../log-in/Login';
+import { createMessagingClient } from '../messaging/messagingClient';
+import { HomeResultDto } from 'tardis-bank-dtos'
 
 type HostState = {
     isAuthenticated: boolean,
@@ -22,8 +24,17 @@ export class Host extends React.Component<HostProps, HostState> {
         this.setState({isAuthenticated: false, showRegistration: false});
     }
 
+    componentDidMount() {
+        createMessagingClient().get<HomeResultDto>("api/")
+            .then(result => {
+                if(result.Email) {
+                    this.setState({isAuthenticated: true});
+                }
+            });
+
+    }
+
     onAuthenticated (token: string) {
-        console.log(token);
         localStorage.setItem('tardis-token', token);
         this.setState({isAuthenticated: true, showRegistration: false});
     }
