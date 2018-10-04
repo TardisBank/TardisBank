@@ -24,6 +24,7 @@ export class Host extends React.Component<HostProps, HostState> {
 
     onAuthenticated (token: string) {
         console.log(token);
+        localStorage.setItem('tardis-token', token);
         this.setState({isAuthenticated: true, showRegistration: false});
     }
 
