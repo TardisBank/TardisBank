@@ -39,8 +39,9 @@ export const createMessagingClient = () => {
                 if (!result.ok) {
                     throw new Error(`Request for ${location} failed with ${result.statusText}`);
                 }
-                return result.json().then(json => { return <TResponse>json });
-            });
+                return result.json() })
+            .then(json => { return <TResponse>json });
+            
     }
 
     const get = <TResponse extends {}>(

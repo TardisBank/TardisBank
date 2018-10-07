@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { CssBaseline, Avatar, withStyles, WithStyles, Typography, FormControl, InputLabel, Input, Button } from '@material-ui/core';
+import { Avatar, withStyles, WithStyles, Typography, FormControl, InputLabel, Input, Button } from '@material-ui/core';
+import { LockOutlined } from '@material-ui/icons';
 import Paper from '@material-ui/core/Paper';
-import { withRoot } from '../withRoot'
 import { styles } from './Login.styles';
 import { createMessagingClient, LoginRequest } from '../messaging/messagingClient';
 import { LoginResultDto } from 'tardis-bank-dtos'
@@ -44,8 +44,8 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
 
         createMessagingClient().post<LoginRequest, LoginResultDto>('api/login', { email, password })
             .then(response => {
-                    this.props.onAuthenticated(response.Token);
-            }).catch(err => {
+                this.props.onAuthenticated(response.Token);
+            }).catch(() => {
                 this.setState({
                     ...this.state,
                     isLoding: false,
@@ -67,11 +67,10 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
 
         return (
             <>
-                <CssBaseline />
                 <main className={classes.layout}>
                     <Paper className={classes.paper}>
                         <Avatar className={classes.avatar}>
-                            <p>H</p>
+                            <LockOutlined />
                         </Avatar>
                         <Typography variant="headline">
                             Sign in
@@ -120,4 +119,4 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
 
 }
 
-export const Login = withRoot(withStyles(styles)(LoginBase));
+export const Login = withStyles(styles)(LoginBase);
