@@ -8,6 +8,7 @@ namespace TardisBank.IntegrationTests
         public static void UpdateEmailVerified(string email)
         {
             var connectionString = Environment.GetEnvironmentVariable("TARDISBANK_DB_CON");
+
             using (var conn = new NpgsqlConnection(connectionString))
             {
                 conn.Open();
