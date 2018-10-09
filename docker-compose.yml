@@ -13,6 +13,9 @@ services:
     build: server
     environment:
       TARDISBANK_DB_CON: "Server=db;Port=5432;Database=tardisbank;User Id=tardisbank_app;Password=_wHaT3v3R;"
+      TARDISBANK_KEY: "secret-key"
+      TARDISBANK_SMTP_SERVER: "smtp:25:false"
+      TARDISBANK_SMTP_CREDENTIALS: "username:password"
     ports:
       - "5000:5000"
       
@@ -20,3 +23,7 @@ services:
     build: client
     ports:
       - "3000:3000"
+      
+  smtp:
+    image: namshi/smtp
+    
