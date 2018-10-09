@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    build: db
+    environment:
+      POSTGRES_USER: "tardisbank_app"
+      POSTGRES_PASSWORD: "_wHaT3v3R"
+      POSTGRES_DB: "tardisbank"
+      
+  api:
+    build: server
+    environment:
+      TARDISBANK_DB_CON: "Server=db;Port=5432;Database=tardisbank;User Id=tardisbank_app;Password=_wHaT3v3R;"
+      
