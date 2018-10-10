@@ -1,55 +1,84 @@
 import * as React from 'react';
-import { Drawer, List, ListItem, ListItemText, withStyles, WithStyles, ListItemIcon } from '@material-ui/core';
-import { CreditCard, People, CalendarToday } from '@material-ui/icons';
-import { Theme, createStyles } from '@material-ui/core';
+import classNames from 'classnames';
+import { Drawer, List, ListItem, ListItemText, withStyles, WithStyles, ListItemIcon, IconButton } from '@material-ui/core';
+import { CreditCard, People, CalendarToday, ChevronLeft } from '@material-ui/icons';
+import { styles } from './Navigation.styles';
 
-const drawerWidth = 240;
+type NavigationStateProps = {
+    isOpen: boolean,
+    selectedMenuItem: MenuItemType
+}
 
-const styles = (theme: Theme) => createStyles({
-    drawerPaper: {
-        position: 'relative',
-        whiteSpace: 'nowrap',
-        width: drawerWidth,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen
-        })
-    } 
-});
+type NavigationDispatchProps = {
+    onToobarIconClick: () => void,
+    onMenuClick: (menuItem: MenuItemType) => void
+}
 
-type NavigationProps = WithStyles<typeof styles>
+export enum MenuItemType {
+    Children,
+    Transactions,
+    Schedules
+}
 
-class nav extends React.Component<NavigationProps,{}> {
+type NavigationProps = NavigationStateProps & NavigationDispatchProps & WithStyles<typeof styles>
+
+class nav extends React.Component<NavigationProps, {}> {
+
+    constructor(props: NavigationProps) {
+        super(props);
+        this.onMenuItemClick = this.onMenuItemClick.bind(this);
+    }
+
+    onMenuItemClick(menuItem: MenuItemType) {
+        this.props.onMenuClick(menuItem);
+    }
 
     render() {
 
-        const {classes} = this.props;
+        const { classes, onToobarIconClick, selectedMenuItem } = this.props;
 
         return (
-            <Drawer 
+            <Drawer
                 variant="permanent"
                 open={true}
                 classes={{
-                    paper: classes.drawerPaper 
+                    paper: classNames(classes.drawerPaper, !this.props.isOpen && classes.drawerPaperClose)
                 }}>
+                <div className={classes.toolbarIcon}>
+                    <IconButton onClick={onToobarIconClick}>
+                        <ChevronLeft />
+                    </IconButton>
+                </div>
                 <List>
-                    <ListItem button={true}>
+                    <ListItem 
+                        button={true}
+                        selected={selectedMenuItem === MenuItemType.Children}
+                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Children)}
+                        >
                         <ListItemIcon>
                             <People />
                         </ListItemIcon>
                         <ListItemText primary="Children" />
                     </ListItem>
-                    <ListItem button={true}>
+                    <ListItem 
+                        button={true}
+                        selected={selectedMenuItem === MenuItemType.Transactions}
+                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Transactions)}
+                        >
                         <ListItemIcon>
                             <CreditCard />
                         </ListItemIcon>
-                         <ListItemText primary="Transactions" />
+                        <ListItemText primary="Transactions" />
                     </ListItem>
-                    <ListItem button={true}>
+                    <ListItem 
+                        button={true}
+                        selected={selectedMenuItem === MenuItemType.Schedules}
+                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Schedules)}
+                        >
                         <ListItemIcon>
                             <CalendarToday />
                         </ListItemIcon>
-                         <ListItemText primary="Schedules" />
+                        <ListItemText primary="Schedules" />
                     </ListItem>
                 </List>
             </Drawer>

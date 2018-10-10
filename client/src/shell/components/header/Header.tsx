@@ -1,40 +1,47 @@
 import * as React from 'react';
+import classNames from 'classnames';
 import { AppBar, IconButton, Toolbar, Typography, withStyles, WithStyles } from '@material-ui/core';
-import { createStyles } from '@material-ui/core';
+import { Menu } from '@material-ui/icons'
+import { styles } from './Header.styles';
 
-const styles = () => createStyles({
-    root: {
-        flexGrow: 1
-    },
-    grow: {
-        flexGrow: 1
-    },
-    menuButton: {
-        marginLeft: -12,
-        marginRight: 20
-    }
-});
-type HeaderProps = WithStyles<typeof styles>;
+type HeaderStateProps = {
+    isOpen: boolean
+}
+
+type HeaderDispatchProps = {
+    onMenuClick: () => void;
+}
+
+type HeaderProps = HeaderStateProps & HeaderDispatchProps & WithStyles<typeof styles>;
 
 class HeaderBase extends React.Component<HeaderProps, {}> {
 
     render() {
 
-        const { classes } = this.props;
-
+        const { classes, onMenuClick } = this.props;
         return (
-            <div className={classes.root}>
-                <AppBar position="static">
-                    <Toolbar>
-                        <IconButton className={classes.menuButton} color="inherit">
-                            <span>M</span>
-                        </IconButton>
-                        <Typography variant="title" color="inherit" className={classes.grow}>
-                            Tardis Bank
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
-            </div>
+            <AppBar position="absolute" className={classNames(classes.root, this.props.isOpen && classes.shift)}>
+                <Toolbar>
+                    <IconButton 
+                        color="inherit"
+                        onClick={onMenuClick}
+                        className={classNames(
+                            classes.menuButton,
+                            this.props.isOpen && classes.menuButtonHidden
+                        )}
+                        >
+                        <Menu />
+                    </IconButton>
+                    <Typography 
+                        variant="title" 
+                        component="h1"
+                        noWrap={true}
+                        className={classes.title}
+                        color="inherit">
+                        Tardis Bank
+                    </Typography>
+                </Toolbar>
+            </AppBar>
         );
     }
 }
