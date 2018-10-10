@@ -2,55 +2,40 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { Drawer, List, ListItem, ListItemText, withStyles, WithStyles, ListItemIcon, IconButton } from '@material-ui/core';
 import { CreditCard, People, CalendarToday, ChevronLeft } from '@material-ui/icons';
-import { Theme, createStyles } from '@material-ui/core';
-
-const drawerWidth = 240;
-
-const styles = (theme: Theme) => createStyles({
-    drawerPaper: {
-        position: 'relative',
-        whiteSpace: 'nowrap',
-        width: drawerWidth,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen
-        })
-    },
-    drawerPaperClose: {
-        overflowX: 'hidden',
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing.unit * 7,
-        [theme.breakpoints.up('sm')]: {
-            width: theme.spacing.unit * 9,
-        },
-    },
-    toolbarIcon: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: '0 8px',
-        ...theme.mixins.toolbar,
-    },
-});
+import { styles } from './Navigation.styles';
 
 type NavigationStateProps = {
-    isOpen: boolean
+    isOpen: boolean,
+    selectedMenuItem: MenuItemType
 }
 
 type NavigationDispatchProps = {
-    onToobarIconClick: () => void
+    onToobarIconClick: () => void,
+    onMenuClick: (menuItem: MenuItemType) => void
+}
+
+export enum MenuItemType {
+    Children,
+    Transactions,
+    Schedules
 }
 
 type NavigationProps = NavigationStateProps & NavigationDispatchProps & WithStyles<typeof styles>
 
 class nav extends React.Component<NavigationProps, {}> {
 
+    constructor(props: NavigationProps) {
+        super(props);
+        this.onMenuItemClick = this.onMenuItemClick.bind(this);
+    }
+
+    onMenuItemClick(menuItem: MenuItemType) {
+        this.props.onMenuClick(menuItem);
+    }
+
     render() {
 
-        const { classes, onToobarIconClick } = this.props;
+        const { classes, onToobarIconClick, selectedMenuItem } = this.props;
 
         return (
             <Drawer
@@ -65,19 +50,31 @@ class nav extends React.Component<NavigationProps, {}> {
                     </IconButton>
                 </div>
                 <List>
-                    <ListItem button={true}>
+                    <ListItem 
+                        button={true}
+                        selected={selectedMenuItem === MenuItemType.Children}
+                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Children)}
+                        >
                         <ListItemIcon>
                             <People />
                         </ListItemIcon>
                         <ListItemText primary="Children" />
                     </ListItem>
-                    <ListItem button={true}>
+                    <ListItem 
+                        button={true}
+                        selected={selectedMenuItem === MenuItemType.Transactions}
+                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Transactions)}
+                        >
                         <ListItemIcon>
                             <CreditCard />
                         </ListItemIcon>
                         <ListItemText primary="Transactions" />
                     </ListItem>
-                    <ListItem button={true}>
+                    <ListItem 
+                        button={true}
+                        selected={selectedMenuItem === MenuItemType.Schedules}
+                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Schedules)}
+                        >
                         <ListItemIcon>
                             <CalendarToday />
                         </ListItemIcon>

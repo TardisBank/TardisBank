@@ -1,40 +1,45 @@
 import * as React from 'react';
-import { WithStyles, withStyles, createStyles, Theme } from '@material-ui/core';
+import { WithStyles, withStyles } from '@material-ui/core';
 import { Header } from './components/header/Header';
-import { Navigation } from './components/navigation/Navigation'
-
-const styles = (theme: Theme) => createStyles({
-    root: {
-        display: 'flex',
-    },
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing.unit * 3,
-        height: '100vh',
-        overflow: 'auto'
-    },
-    appBarSpacer: theme.mixins.toolbar
-});
+import { Navigation, MenuItemType } from './components/navigation/Navigation'
+import { Content } from './components/content/Content';
+import { styles } from './Shell.styles';
 
 type ShellProps = WithStyles<typeof styles>;
 
 type ShellState = {
-    isSideBarOpen: boolean
+    isSideBarOpen: boolean,
+    selectedMenuItem: MenuItemType
 };
 
 class shell extends React.Component<ShellProps, ShellState> {
 
-    state = { isSideBarOpen: false }
+    state = { isSideBarOpen: false, selectedMenuItem: MenuItemType.Children }
 
     constructor(props: ShellProps) {
         super(props);
 
         this.handleSidebarClick = this.handleSidebarClick.bind(this);
+        this.onMenuClick = this.onMenuClick.bind(this);
     }
 
 
     handleSidebarClick() {
-        this.setState(state => {return {isSideBarOpen: !state.isSideBarOpen}});
+        this.setState(state => {
+            return {
+                ...state,
+                isSideBarOpen: !state.isSideBarOpen
+            }
+        });
+    }
+
+    onMenuClick(selectedMenuItem: MenuItemType) {
+        this.setState(state => {
+            return {
+                ...state,
+                selectedMenuItem
+            }
+        })
     }
 
     render() {
@@ -42,14 +47,21 @@ class shell extends React.Component<ShellProps, ShellState> {
         return (
             <div className={classes.root}>
                 <Header isOpen={this.state.isSideBarOpen} onMenuClick={this.handleSidebarClick} />
-                <Navigation isOpen={this.state.isSideBarOpen} onToobarIconClick={this.handleSidebarClick} />
+                <Navigation
+                    isOpen={this.state.isSideBarOpen}
+                    onToobarIconClick={this.handleSidebarClick}
+                    selectedMenuItem={this.state.selectedMenuItem}
+                    onMenuClick={this.onMenuClick}
+                />
                 <main className={classes.content}>
                     <div className={classes.appBarSpacer} />
-                    <p>Stuff</p>
+                    <Content selectedMenuItem={this.state.selectedMenuItem}/>
                 </main>
             </div>);
 
     }
 }
+
+
 
 export const Shell = withStyles(styles)(shell);

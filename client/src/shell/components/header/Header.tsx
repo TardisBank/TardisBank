@@ -1,38 +1,8 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { AppBar, Theme, IconButton, Toolbar, Typography, withStyles, WithStyles } from '@material-ui/core';
-import { createStyles } from '@material-ui/core';
+import { AppBar, IconButton, Toolbar, Typography, withStyles, WithStyles } from '@material-ui/core';
 import { Menu } from '@material-ui/icons'
-
-const drawerWidth = 240;
-
-const styles = (theme: Theme) => createStyles({
-    root: {
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-    shift: {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.enteringScreen,
-        }),   
-    }, 
-  menuButton: {
-    marginLeft: 12,
-    marginRight: 36,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-      flexGrow: 1
-  }
-});
+import { styles } from './Header.styles';
 
 type HeaderStateProps = {
     isOpen: boolean
