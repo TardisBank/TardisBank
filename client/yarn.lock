@@ -61,6 +61,10 @@
     "@babel/runtime" "7.0.0"
     recompose "^0.29.0"
 
+"@types/classnames@^2.2.6":
+  version "2.2.6"
+  resolved "http://localhost:8081/repository/npm-registry/@types/classnames/-/classnames-2.2.6.tgz#dbe8a666156d556ed018e15a4c65f08937c3f628"
+
 "@types/history@*":
   version "4.7.0"
   resolved "http://localhost:8081/repository/npm-registry/@types/history/-/history-4.7.0.tgz#2fac51050c68f7d6f96c5aafc631132522f4aa3f"
@@ -1517,7 +1521,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.5:
+classnames@^2.2.5, classnames@^2.2.6:
   version "2.2.6"
   resolved "http://localhost:8081/repository/npm-registry/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
 
