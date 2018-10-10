@@ -3,27 +3,29 @@ services:
   db:
     build: db
     environment:
-      POSTGRES_USER: "tardisbank_app"
-      POSTGRES_PASSWORD: "_wHaT3v3R"
-      POSTGRES_DB: "tardisbank"
+      POSTGRES_USER: ${TARDISBANK_DB_USER:-tardisbank_app}
+      POSTGRES_PASSWORD: ${TARDISBANK_DB_PASSWORD:-_wHaT3v3R}
+      POSTGRES_DB: ${TARDISBANK_DB_DATABASENAME:-tardisbank}
     ports: 
       - "5432:5432"
       
   api:
     build: server
     environment:
-      TARDISBANK_DB_CON: "Server=db;Port=5432;Database=tardisbank;User Id=tardisbank_app;Password=_wHaT3v3R;"
-      TARDISBANK_KEY: "secret-key"
-      TARDISBANK_SMTP_SERVER: "smtp:25:false"
+      TARDISBANK_DB_CON: ${TARDISBANK_DB_CON:-"Server=db;Port=5432;Database=${TARDISBANK_DB_DATABASENAME:-tardisbank};User Id=${DB_USER:-tardisbank_app};Password=${TARDISBANK_DB_PASSWORD:-_wHaT3v3R};"}
+      TARDISBANK_KEY: ${TARDISBANK_KEY:-secret-key}
+      TARDISBANK_SMTP_SERVER: "mail:25:false"
       TARDISBANK_SMTP_CREDENTIALS: "username:password"
     ports:
-      - "5000:5000"
+      - "5000:80"
       
   client:
     build: client
     ports:
       - "3000:3000"
       
-  smtp:
+  mail:
     image: namshi/smtp
+    env_file:
+      - .env
     
