@@ -16,8 +16,5 @@ You can copy an example `.env`:
 
     cp .env.example .env
 
-In order to set up outgoing email/SMTP, you can add more environement variable in your .env,
-for example `GMAIL_USER` `GMAIL_PASSWORD` for using Gmail's SMTP. See the docs [here](https://github.com/namshi/docker-smtp)
-
 If you need to spin up a TardisBank instance with different backends (e.g., external database), 
 you'll need to customize the `docker-compose.yml`
