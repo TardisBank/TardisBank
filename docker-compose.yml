@@ -1,0 +1,37 @@
+version: '3'
+services:
+  db:
+    build: db
+    environment:
+      POSTGRES_USER: ${TARDISBANK_DB_USER:-tardisbank_app}
+      POSTGRES_PASSWORD: ${TARDISBANK_DB_PASSWORD:-_wHaT3v3R}
+      POSTGRES_DB: ${TARDISBANK_DB_DATABASENAME:-tardisbank}
+    expose:
+      - "5432"
+      
+  api:
+    build: server
+    environment:
+      TARDISBANK_DB_CON: "Server=db;Port=5432;Database=${TARDISBANK_DB_DATABASENAME:-tardisbank};User Id=${DB_USER:-tardisbank_app};Password=${TARDISBANK_DB_PASSWORD:-_wHaT3v3R};"
+      TARDISBANK_KEY: ${TARDISBANK_KEY:-secret-key}
+      TARDISBANK_SMTP_SERVER: "mail:25:false"
+      TARDISBANK_SMTP_CREDENTIALS: "username:password"
+    expose:
+      - "80"
+    depends_on:
+      - db
+      - mail
+      
+  client:
+    build: client
+    ports:
+      - "80:80"
+    environment:
+      NODE_ENV: prod
+    depends_on:
+      - api
+      
+  mail:
+    image: namshi/smtp
+    expose:
+      - "25"

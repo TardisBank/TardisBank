@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TardisBank.IntegrationTests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TardisBank.UnitTests", "TardisBank.UnitTests\TardisBank.UnitTests.csproj", "{508DB34C-34FA-4428-B65F-62B0A86FA554}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TardisBank.Dto", "TardisBank.Dto\TardisBank.Dto.csproj", "{911DEF7A-92B4-4F84-93FB-612EDC0CA884}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,17 @@ Global
 		{508DB34C-34FA-4428-B65F-62B0A86FA554}.Release|x64.Build.0 = Release|Any CPU
 		{508DB34C-34FA-4428-B65F-62B0A86FA554}.Release|x86.ActiveCfg = Release|Any CPU
 		{508DB34C-34FA-4428-B65F-62B0A86FA554}.Release|x86.Build.0 = Release|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Debug|x64.Build.0 = Debug|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Debug|x86.Build.0 = Debug|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Release|Any CPU.Build.0 = Release|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Release|x64.ActiveCfg = Release|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Release|x64.Build.0 = Release|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Release|x86.ActiveCfg = Release|Any CPU
+		{911DEF7A-92B4-4F84-93FB-612EDC0CA884}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
