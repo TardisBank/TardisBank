@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Login } from '../log-in/Login';
 import { Shell } from '../shell/Shell';
-import { createMessagingClient } from '../messaging/messagingClient';
+import { getMessagingClient } from '../messaging/messagingClient';
 import { HomeResultDto } from 'tardis-bank-dtos'
 import { withRoot } from '../withRoot'
 
@@ -13,6 +13,7 @@ type HostState = {
 
 type HostProps = {
     authToken?: string,
+    storageKey: string
 }
 
 class host extends React.Component<HostProps, HostState> {
@@ -28,15 +29,29 @@ class host extends React.Component<HostProps, HostState> {
     }
 
     componentDidMount() {
-        createMessagingClient().get<HomeResultDto>("api/")
+        getMessagingClient().get<HomeResultDto>("api/")
             .then(result => {
                     this.setState({isAuthenticated: result.Email !== null, isReady:true});
+            }).catch(error => {
+                // TODO: Check for the actual status code
+                // TODO: Move this into the messaging client so all requests are handled
+                if(error.message.includes('Unauthorized')) {
+                    localStorage.removeItem(this.props.storageKey);
+                    this.setState(() => {
+                        return {
+                            isAuthenticated: false,
+                            isReady: true
+                        };
+                    })
+                }
+                else {
+                    throw error;
+                }
             });
-
     }
 
     onAuthenticated (token: string) {
-        localStorage.setItem('tardis-token', token);
+        localStorage.setItem(this.props.storageKey, token);
         this.setState({isAuthenticated: true, showRegistration: false});
     }
 

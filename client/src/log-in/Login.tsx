@@ -3,7 +3,7 @@ import { Avatar, withStyles, WithStyles, Typography, FormControl, InputLabel, In
 import { LockOutlined } from '@material-ui/icons';
 import Paper from '@material-ui/core/Paper';
 import { styles } from './Login.styles';
-import { createMessagingClient, LoginRequest } from '../messaging/messagingClient';
+import { getMessagingClient, LoginRequest } from '../messaging/messagingClient';
 import { LoginResultDto } from 'tardis-bank-dtos'
 
 type LoginState = {
@@ -42,7 +42,7 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
         this.setState({ ...this.state, isLoding: true });
         event.preventDefault();
 
-        createMessagingClient().post<LoginRequest, LoginResultDto>('api/login', { email, password })
+        getMessagingClient().post<LoginRequest, LoginResultDto>('api/login', { email, password })
             .then(response => {
                 this.props.onAuthenticated(response.Token);
             }).catch(() => {
