@@ -1,7 +1,20 @@
-export const createMessagingClient = () => {
+let messagingClient : MesssgingClient;
+
+export const initMessagingClient =(keyName: string) => {
+    messagingClient = createMessagingClient(keyName);
+}
+
+export const getMessagingClient = () => {
+    if(!messagingClient) {
+        throw new Error("Messaging client has not been initialised");
+    }
+    return messagingClient;
+}
+
+const createMessagingClient = (storageKey: string) => {
 
     const bearerToken = (): string | null => {
-        return localStorage.getItem('tardis-token')
+        return localStorage.getItem(storageKey)
     }
 
     const requestInit = (method: string, body?: any) => {
