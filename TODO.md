@@ -41,10 +41,6 @@
 
 # FE
 
-- Create Razor pages application.
-
-- Deploy to Azure.
-
 - Homepage.
 
 - Signup.
