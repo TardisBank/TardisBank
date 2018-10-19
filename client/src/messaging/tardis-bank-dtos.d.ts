@@ -15,4 +15,13 @@ declare module "tardis-bank-dtos" {
     interface HomeResultDto extends BaseDto {
         Email: string;
     }
+
+    interface RegisterRequest {
+        Email: string;
+        Password: string;
+    }
+
+    interface RegisterResponse extends BaseDto {
+
+    }
 }
