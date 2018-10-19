@@ -1,42 +1,63 @@
 import * as React from 'react';
 import { Avatar, withStyles, WithStyles, Typography, Button, TextField } from '@material-ui/core';
-import { LockOutlined } from '@material-ui/icons';
+import { PersonAdd } from '@material-ui/icons';
 import Paper from '@material-ui/core/Paper';
-import { styles } from './Login.styles';
+import { styles } from './RegistrationForm.styles';
 
-type LoginState = {
+type RegisterState = {
     email: string,
-    password: string
+    password: string,
+    confirmPassword: string,
+    passowrdsMismatched: boolean
 };
 
-export enum LoginProcess {
+export enum RegisterProcess {
     Ready,
     Loading,
-    Error
+    Error,
+    Sent
 }
 
-type LoginStateProps = {
-    loginProcess: LoginProcess
+type RegisterStateProps = {
+    registerProcess: RegisterProcess,
 }
 
-type LoginDispatchProps = {
-    onLogin: (email: string, password: string) => void;
+type RegisterDispatchProps = {
+    onRegister: (email: string, password: string, confirmPassword: string) => void;
     toggleSignIn: () => void;
 }
 
-type LoginProps = LoginDispatchProps & LoginStateProps & WithStyles<typeof styles>;
+type RegisterProps = RegisterDispatchProps & RegisterStateProps & WithStyles<typeof styles>;
 
-class LoginBase extends React.Component<LoginProps, LoginState> {
+class RegisterBase extends React.Component<RegisterProps, RegisterState> {
 
     state = {
         email: '',
-        password: ''
-    } as LoginState;
+        password: '',
+        confirmPassword: '',
+        passowrdsMismatched: false
+    } as RegisterState;
 
     handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        const { email, password } = this.state;
-        this.props.onLogin(email, password);
+        const { email, password, confirmPassword } = this.state;
+        if (password !== confirmPassword) {
+            this.setState(state => {
+                return {
+                    ...state,
+                    passowrdsMismatched: true
+                }
+            });
+        }
+        else {
+            this.setState(state => {
+                return {
+                    ...state,
+                    passowrdsMismatched: false
+                }
+            });
+            this.props.onRegister(email, password, confirmPassword);
+        }
     }
 
     handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,14 +75,19 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
                 <main className={classes.layout}>
                     <Paper className={classes.paper}>
                         <Avatar className={classes.avatar}>
-                            <LockOutlined />
+                            <PersonAdd />
                         </Avatar>
                         <Typography variant="headline">
-                            Sign in
+                            Register
                         </Typography>
-                        {this.props.loginProcess === LoginProcess.Error &&
+                        {this.props.registerProcess === RegisterProcess.Error &&
                             <Typography variant="subheading">
                                 Incorrect email or password
+                            </Typography>
+                        }
+                        {this.state.passowrdsMismatched &&
+                            <Typography variant="subheading">
+                                The passwords do not match
                             </Typography>
                         }
                         <form className={classes.form} onSubmit={this.handleSubmit}>
@@ -90,30 +116,32 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
                                 variant={"outlined"}
 
                             />
+                            <TextField
+                                id="confirm-password"
+                                name="confirmPassword"
+                                label="Confirm Password"
+                                type="password"
+                                fullWidth={true}
+                                required={true}
+                                margin="normal"
+                                value={this.state.confirmPassword}
+                                onChange={this.handleChange}
+                                variant={"outlined"}
+
+                            />
                             <Button
                                 type="submit"
                                 fullWidth={true}
                                 variant="raised"
                                 color="primary"
-                                disabled={this.props.loginProcess === LoginProcess.Loading}
+                                disabled={this.props.registerProcess === RegisterProcess.Loading}
                                 className={classes.submit}
                             >
-                                Sign in
+                                Register
                             </Button>
                         </form>
-                        <Typography 
-                            variant="caption">
-                            <p>New to Tardis Bank?
-                            <Button
-                                    color="default"
-                                    variant="outlined"
-                                    fullWidth={true}
-                                    className={classes.submit}
-                                    onClick={this.props.toggleSignIn}
-                                >
-                                    Register Here</Button>
-                            </p>
-
+                        <Typography variant="caption">
+                            <a href="#" onClick={this.props.toggleSignIn}>Sign In</a>
                         </Typography>
                     </Paper>
                 </main>
@@ -123,4 +151,4 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
 
 }
 
-export const Login = withStyles(styles)(LoginBase);
+export const Register = withStyles(styles)(RegisterBase);
