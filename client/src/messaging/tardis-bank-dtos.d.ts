@@ -24,4 +24,12 @@ declare module "tardis-bank-dtos" {
     interface RegisterResponse extends BaseDto {
 
     }
+
+    interface AccountRequest {
+        Name: string
+    }
+
+    interface AccountResponse extends BaseDto {
+        
+    }
 }

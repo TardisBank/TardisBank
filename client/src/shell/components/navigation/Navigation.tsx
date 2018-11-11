@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { Drawer, List, ListItem, ListItemText, withStyles, WithStyles, ListItemIcon, IconButton } from '@material-ui/core';
-import { CreditCard, People, CalendarToday, ChevronLeft } from '@material-ui/icons';
+import { Drawer, List, ListItem, ListItemText, withStyles, WithStyles, ListItemIcon, IconButton, Avatar } from '@material-ui/core';
+import { ChevronLeft } from '@material-ui/icons';
 import { styles } from './Navigation.styles';
 
 type NavigationStateProps = {
@@ -29,13 +29,46 @@ class nav extends React.Component<NavigationProps, {}> {
         this.onMenuItemClick = this.onMenuItemClick.bind(this);
     }
 
-    onMenuItemClick(menuItem: MenuItemType) {
+    onMenuItemClick (menuItem: MenuItemType) {
         this.props.onMenuClick(menuItem);
+    }
+
+    private makeColour(name: string) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++){
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        let colour = '#';
+        for (let i = 0; i < 3; i++) {
+            let value = (hash >> (i * 8)) & 0xFF;
+            colour += ('00' + value.toString(16)).substr(-2);
+        }
+
+        return colour;
+    }
+
+    private listItem(menuType: MenuItemType, name: string) {
+        const isSelected = this.props.selectedMenuItem === menuType
+        return (
+            <ListItem
+                button={true}
+                selected={isSelected}
+                onClick={this.onMenuItemClick.bind(this, menuType)}
+            >
+                <ListItemIcon>
+                    <Avatar style={{backgroundColor: this.makeColour(name)}}>
+                        {name[0]}
+                    </Avatar>
+                </ListItemIcon>
+                <ListItemText primary={name} />
+            </ListItem>
+        )
     }
 
     render() {
 
-        const { classes, onToobarIconClick, selectedMenuItem } = this.props;
+        const { classes, onToobarIconClick } = this.props;
 
         return (
             <Drawer
@@ -50,36 +83,15 @@ class nav extends React.Component<NavigationProps, {}> {
                     </IconButton>
                 </div>
                 <List>
-                    <ListItem 
-                        button={true}
-                        selected={selectedMenuItem === MenuItemType.Children}
-                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Children)}
-                        >
-                        <ListItemIcon>
-                            <People />
-                        </ListItemIcon>
-                        <ListItemText primary="Children" />
-                    </ListItem>
-                    <ListItem 
-                        button={true}
-                        selected={selectedMenuItem === MenuItemType.Transactions}
-                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Transactions)}
-                        >
-                        <ListItemIcon>
-                            <CreditCard />
-                        </ListItemIcon>
-                        <ListItemText primary="Transactions" />
-                    </ListItem>
-                    <ListItem 
-                        button={true}
-                        selected={selectedMenuItem === MenuItemType.Schedules}
-                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Schedules)}
-                        >
-                        <ListItemIcon>
-                            <CalendarToday />
-                        </ListItemIcon>
-                        <ListItemText primary="Schedules" />
-                    </ListItem>
+                    {this.listItem(
+                        MenuItemType.Children,
+                        "Children")}
+                    {this.listItem(
+                        MenuItemType.Transactions,
+                        "Transactions")}
+                    {this.listItem(
+                        MenuItemType.Schedules,
+                        "Schedules")}
                 </List>
             </Drawer>
         );
