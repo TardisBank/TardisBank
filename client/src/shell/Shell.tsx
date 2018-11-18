@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { WithStyles, withStyles } from '@material-ui/core';
+import { WithStyles, withStyles, Button } from '@material-ui/core';
 import { Header } from './components/header/Header';
 import { AccountList } from '../account/AccountList'
 import { Content, ContentView } from './components/content/Content';
 import { styles } from './Shell.styles';
 import { Navigation } from './components/navigation/Navigation';
+import { AddCircle } from '@material-ui/icons';
 
 type ShellProps = WithStyles<typeof styles>;
 
@@ -54,15 +55,17 @@ class shell extends React.Component<ShellProps, ShellState> {
                 <Navigation
                     isOpen={this.state.isSideBarOpen}
                     onAddAccount={this.onAddAccont}
-                    onToobarIconClick={this.onSidebarClick}
-                >
-
-                    <AccountList
-                        accounts={[{ id: '1', name: 'Child A' }]}
-                        selectedAccountId={this.state.selectedAccount}
-                        onAccountSelected={this.onMenuClick}
-                    />
-
+                    onToobarIconClick={this.onSidebarClick} >
+                    <>
+                        <AccountList
+                            accounts={[{ id: '1', name: 'Child A' }]}
+                            selectedAccountId={this.state.selectedAccount}
+                            onAccountSelected={this.onMenuClick} />
+                        <Button
+                            onClick={this.onAddAccont}>
+                            <AddCircle fontSize="large" />
+                        </Button>
+                    </>
                 </Navigation>
                 <main className={classes.content}>
                     <div className={classes.appBarSpacer} />

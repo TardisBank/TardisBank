@@ -1,7 +1,7 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { Drawer, withStyles, WithStyles, IconButton, Button } from '@material-ui/core';
-import { ChevronLeft, AddCircle } from '@material-ui/icons';
+import { Drawer, withStyles, WithStyles, IconButton } from '@material-ui/core';
+import { ChevronLeft } from '@material-ui/icons';
 import { styles } from './Navigation.styles';
 
 type NavigationStateProps = {
@@ -36,11 +36,6 @@ class navigation extends React.Component<NavigationProps, {}> {
                     </IconButton>
                 </div>
                 {this.props.children}
-                <Button
-                    onClick={this.onAddAccountClick}>
-                    <AddCircle fontSize="large" />
-
-                </Button>
             </Drawer>
         );
     }
