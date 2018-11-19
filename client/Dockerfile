@@ -7,7 +7,8 @@ WORKDIR /app
 
 # install and cache app dependencies
 COPY /src /app/src 
-COPY ["package.json", "yarn.lock", "./"]
+COPY /public /app/public
+COPY ["package.json", "yarn.lock","tsconfig.json", "tsconfig.prod.json", "tslint.json", "./"]
 RUN yarn install
 RUN yarn build
 
