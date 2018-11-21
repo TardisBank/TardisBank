@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { AddAccount } from '../../../account/';
-
+import { AddAccountContainer } from '../../../account/';
 
 export enum ContentView {
     'ShowAccount',
@@ -16,7 +15,7 @@ type ContentProps = {
 export const Content: React.SFC<ContentProps> = (props: ContentProps) => {
     switch (props.viewType) {
         case ContentView.AddAccount:
-            return <AddAccount />
+            return <AddAccountContainer />
         case ContentView.ShowAccount:
             return <div>An account with id {props.selectedAccount}</div>
         case ContentView.Empty:

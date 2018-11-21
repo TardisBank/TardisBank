@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { WithStyles, withStyles, Button } from '@material-ui/core';
 import { Header } from './components/header/Header';
-import { AccountList } from '../account/AccountList'
+import { Accounts } from '../account/Accounts'
 import { Content, ContentView } from './components/content/Content';
 import { styles } from './Shell.styles';
 import { Navigation } from './components/navigation/Navigation';
@@ -57,7 +57,7 @@ class shell extends React.Component<ShellProps, ShellState> {
                     onAddAccount={this.onAddAccont}
                     onToobarIconClick={this.onSidebarClick} >
                     <>
-                        <AccountList
+                        <Accounts
                             accounts={[{ id: '1', name: 'Child A' }]}
                             selectedAccountId={this.state.selectedAccount}
                             onAccountSelected={this.onMenuClick} />

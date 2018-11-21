@@ -17,7 +17,7 @@ export type Account = {
 
 type AccountListProps = AccountListStateProps & AccountListDispatchProps;  
 
-export class AccountList extends React.Component<AccountListProps, {}> {
+export class Accounts extends React.Component<AccountListProps, {}> {
 
     constructor(props: AccountListProps) {
         super(props);
@@ -47,6 +47,7 @@ export class AccountList extends React.Component<AccountListProps, {}> {
         const isSelected = !this.props.selectedAccountId && this.props.selectedAccountId === account.id
         return (
             <ListItem
+                key={account.name}
                 button={true}
                 selected={isSelected}
                 onClick={this.onAccountSelected.bind(this, account.id)}

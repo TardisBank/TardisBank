@@ -26,7 +26,7 @@ declare module "tardis-bank-dtos" {
     }
 
     interface AccountRequest {
-        Name: string
+        AccountName: string
     }
 
     interface AccountResponse extends BaseDto {

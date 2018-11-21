@@ -1,2 +1,2 @@
-export * from './AccountList';
-export * from './AddAccount';
+export * from './Accounts';
+export * from './AddAccountContainer';
