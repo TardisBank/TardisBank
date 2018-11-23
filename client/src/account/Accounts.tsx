@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { List, ListItem, ListItemText, ListItemIcon, Avatar } from '@material-ui/core';
+import { Account } from '../model';
 
 type AccountListStateProps = {
     selectedAccountId?: string,
@@ -8,11 +9,6 @@ type AccountListStateProps = {
 
 type AccountListDispatchProps = {
     onAccountSelected: (accountId: string) => void,
-}
-
-export type Account = {
-    id: string,
-    name: string
 }
 
 type AccountListProps = AccountListStateProps & AccountListDispatchProps;  
@@ -47,7 +43,7 @@ export class Accounts extends React.Component<AccountListProps, {}> {
         const isSelected = !this.props.selectedAccountId && this.props.selectedAccountId === account.id
         return (
             <ListItem
-                key={account.name}
+                key={account.id}
                 button={true}
                 selected={isSelected}
                 onClick={this.onAccountSelected.bind(this, account.id)}
