@@ -5,7 +5,7 @@ declare module "tardis-bank-dtos" {
     }
 
     interface BaseDto {
-        Links: Array<LinkDto>,
+        Links: ReadonlyArray<LinkDto>,
     }
 
     interface LoginResultDto extends BaseDto{
@@ -23,5 +23,17 @@ declare module "tardis-bank-dtos" {
 
     interface RegisterResponse extends BaseDto {
 
+    }
+
+    interface AccountRequest {
+        AccountName: string
+    }
+
+    interface AccountResponse extends BaseDto {
+        AccountName: string
+    }
+
+    interface AccountResponseCollection extends BaseDto {
+        Accounts: ReadonlyArray<AccountResponse>
     }
 }

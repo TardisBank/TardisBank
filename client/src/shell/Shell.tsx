@@ -1,30 +1,28 @@
 import * as React from 'react';
-import { WithStyles, withStyles } from '@material-ui/core';
+import { WithStyles, withStyles, Button } from '@material-ui/core';
 import { Header } from './components/header/Header';
-import { Navigation, MenuItemType } from './components/navigation/Navigation'
-import { Content } from './components/content/Content';
+import { Content, ContentView } from './components/content/Content';
 import { styles } from './Shell.styles';
+import { Navigation } from './components/navigation/Navigation';
+import { AddCircle } from '@material-ui/icons';
+import { AccountsContainer } from 'src/account/AccountsContainer';
+import { Account } from '../model';
+
 
 type ShellProps = WithStyles<typeof styles>;
 
 type ShellState = {
     isSideBarOpen: boolean,
-    selectedMenuItem: MenuItemType
+    contentView: ContentView,
+    selectedAccount?: string,
+    accountList: ReadonlyArray<Account>
 };
 
 class shell extends React.Component<ShellProps, ShellState> {
 
-    state = { isSideBarOpen: false, selectedMenuItem: MenuItemType.Children }
+    state = { isSideBarOpen: false, selectedAccount: undefined, contentView: ContentView.Empty, accountList: [] }
 
-    constructor(props: ShellProps) {
-        super(props);
-
-        this.handleSidebarClick = this.handleSidebarClick.bind(this);
-        this.onMenuClick = this.onMenuClick.bind(this);
-    }
-
-
-    handleSidebarClick() {
+    onSidebarClick = () => {
         this.setState(state => {
             return {
                 ...state,
@@ -33,11 +31,41 @@ class shell extends React.Component<ShellProps, ShellState> {
         });
     }
 
-    onMenuClick(selectedMenuItem: MenuItemType) {
+    onMenuClick = (selectedAccount: string) => {
         this.setState(state => {
             return {
                 ...state,
-                selectedMenuItem
+                contentView: ContentView.ShowAccount,
+                selectedAccount
+            }
+        })
+    }
+
+    onAddAccont = () => {
+        this.setState(state => {
+            return {
+                ...state,
+                contentView: ContentView.AddAccount
+            }
+        })
+    }
+
+    onAccountsLoaded = (accountList: ReadonlyArray<Account>) => {
+        this.setState(state => {
+            return {
+                ...state,
+                accountList
+            }
+        })
+    }
+
+    onAccountAdded = (account: Account) => {
+        this.setState(state => {
+            return {
+                ...state,
+                selectedAccount: account.id,
+                contentView: ContentView.ShowAccount,
+                accountList: [...state.accountList, account] 
             }
         })
     }
@@ -46,16 +74,29 @@ class shell extends React.Component<ShellProps, ShellState> {
         const { classes } = this.props;
         return (
             <div className={classes.root}>
-                <Header isOpen={this.state.isSideBarOpen} onMenuClick={this.handleSidebarClick} />
+                <Header isOpen={this.state.isSideBarOpen} onMenuClick={this.onSidebarClick} />
                 <Navigation
                     isOpen={this.state.isSideBarOpen}
-                    onToobarIconClick={this.handleSidebarClick}
-                    selectedMenuItem={this.state.selectedMenuItem}
-                    onMenuClick={this.onMenuClick}
-                />
+                    onAddAccount={this.onAddAccont}
+                    onToobarIconClick={this.onSidebarClick} >
+                    <>
+                        <AccountsContainer
+                            selectedAccountId={this.state.selectedAccount}
+                            onAccountSelected={this.onMenuClick}
+                            onAccountsLoaded={this.onAccountsLoaded}
+                            accounts={this.state.accountList} />
+                        <Button
+                            onClick={this.onAddAccont}>
+                            <AddCircle fontSize="large" />
+                        </Button>
+                    </>
+                </Navigation>
                 <main className={classes.content}>
                     <div className={classes.appBarSpacer} />
-                    <Content selectedMenuItem={this.state.selectedMenuItem}/>
+                    <Content
+                        selectedAccount={this.state.selectedAccount}
+                        onAccountAdded={this.onAccountAdded}
+                        viewType={this.state.contentView} />
                 </main>
             </div>);
 

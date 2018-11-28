@@ -1,41 +1,27 @@
 import * as React from 'react';
 import classNames from 'classnames';
-import { Drawer, List, ListItem, ListItemText, withStyles, WithStyles, ListItemIcon, IconButton } from '@material-ui/core';
-import { CreditCard, People, CalendarToday, ChevronLeft } from '@material-ui/icons';
+import { Drawer, withStyles, WithStyles, IconButton } from '@material-ui/core';
+import { ChevronLeft } from '@material-ui/icons';
 import { styles } from './Navigation.styles';
 
 type NavigationStateProps = {
     isOpen: boolean,
-    selectedMenuItem: MenuItemType
 }
 
 type NavigationDispatchProps = {
     onToobarIconClick: () => void,
-    onMenuClick: (menuItem: MenuItemType) => void
-}
-
-export enum MenuItemType {
-    Children,
-    Transactions,
-    Schedules
+    onAddAccount: () => void;
 }
 
 type NavigationProps = NavigationStateProps & NavigationDispatchProps & WithStyles<typeof styles>
 
-class nav extends React.Component<NavigationProps, {}> {
+class navigation extends React.Component<NavigationProps, {}> {
 
-    constructor(props: NavigationProps) {
-        super(props);
-        this.onMenuItemClick = this.onMenuItemClick.bind(this);
-    }
-
-    onMenuItemClick(menuItem: MenuItemType) {
-        this.props.onMenuClick(menuItem);
-    }
+    onAddAccountClick = () => this.props.onAddAccount();
 
     render() {
 
-        const { classes, onToobarIconClick, selectedMenuItem } = this.props;
+        const { classes, onToobarIconClick } = this.props;
 
         return (
             <Drawer
@@ -49,41 +35,10 @@ class nav extends React.Component<NavigationProps, {}> {
                         <ChevronLeft />
                     </IconButton>
                 </div>
-                <List>
-                    <ListItem 
-                        button={true}
-                        selected={selectedMenuItem === MenuItemType.Children}
-                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Children)}
-                        >
-                        <ListItemIcon>
-                            <People />
-                        </ListItemIcon>
-                        <ListItemText primary="Children" />
-                    </ListItem>
-                    <ListItem 
-                        button={true}
-                        selected={selectedMenuItem === MenuItemType.Transactions}
-                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Transactions)}
-                        >
-                        <ListItemIcon>
-                            <CreditCard />
-                        </ListItemIcon>
-                        <ListItemText primary="Transactions" />
-                    </ListItem>
-                    <ListItem 
-                        button={true}
-                        selected={selectedMenuItem === MenuItemType.Schedules}
-                        onClick={this.onMenuItemClick.bind(this,MenuItemType.Schedules)}
-                        >
-                        <ListItemIcon>
-                            <CalendarToday />
-                        </ListItemIcon>
-                        <ListItemText primary="Schedules" />
-                    </ListItem>
-                </List>
+                {this.props.children}
             </Drawer>
         );
     }
 }
 
-export const Navigation = withStyles(styles)(nav);
+export const Navigation = withStyles(styles)(navigation);
