@@ -40,7 +40,7 @@ export class Accounts extends React.Component<AccountListProps, {}> {
     }
 
     private listItem(account: Account) {
-        const isSelected = !this.props.selectedAccountId && this.props.selectedAccountId === account.id
+        const isSelected = !!this.props.selectedAccountId && this.props.selectedAccountId === account.id
         return (
             <ListItem
                 key={account.id}

@@ -59,6 +59,17 @@ class shell extends React.Component<ShellProps, ShellState> {
         })
     }
 
+    onAccountAdded = (account: Account) => {
+        this.setState(state => {
+            return {
+                ...state,
+                selectedAccount: account.id,
+                contentView: ContentView.ShowAccount,
+                accountList: [...state.accountList, account] 
+            }
+        })
+    }
+
     render() {
         const { classes } = this.props;
         return (
@@ -84,6 +95,7 @@ class shell extends React.Component<ShellProps, ShellState> {
                     <div className={classes.appBarSpacer} />
                     <Content
                         selectedAccount={this.state.selectedAccount}
+                        onAccountAdded={this.onAccountAdded}
                         viewType={this.state.contentView} />
                 </main>
             </div>);
