@@ -2,6 +2,8 @@ version: '3'
 services:
   db:
     build: db
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${TARDISBANK_DB_USER:-tardisbank_app}
       POSTGRES_PASSWORD: ${TARDISBANK_DB_PASSWORD:-_wHaT3v3R}
