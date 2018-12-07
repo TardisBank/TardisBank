@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { TextField, Button } from '@material-ui/core';
+import { TextField, Button, Typography, withStyles, WithStyles } from '@material-ui/core';
+import {styles} from './AddAccount.styles';
 
 type AddAccountState = {
     accountName?: string
@@ -9,8 +10,8 @@ export type AddAccountDispatchProps = {
     onAddAccount: (accountName: string) => void;
 }
 
-export type AddAccountProps = AddAccountDispatchProps;
-export class AddAccount extends React.Component<AddAccountProps, AddAccountState> {
+export type AddAccountProps = AddAccountDispatchProps & WithStyles<typeof styles>;
+class AddAccountBase extends React.Component<AddAccountProps, AddAccountState> {
 
     state = {
         accountName: undefined 
@@ -31,16 +32,24 @@ export class AddAccount extends React.Component<AddAccountProps, AddAccountState
     }
 
     render() {
+
+        const {classes} = this.props;
         return (
-            <form onSubmit={this.handleSubmit}>
+            <main>
+            <Typography>
+                Add account for your child
+            </Typography>
+            <form className={classes.form} onSubmit={this.handleSubmit}>
                 <TextField 
                     name="accountName" 
                     id='accountName' 
-                    label="Account Name"
+                    label="Child's Name"
+                    fullWidth={true}
                     onChange={this.handleChange} 
                     value={this.state.accountName || ''} 
                      />
                 <Button
+                    className={classes.submit}
                     type="submit"
                     color="primary"
                     variant="raised" 
@@ -48,7 +57,12 @@ export class AddAccount extends React.Component<AddAccountProps, AddAccountState
                     Save
                 </Button>
             </form>
+            </main>
         )
 
     }
 }
+
+export const AddAccount = withStyles(styles)(AddAccountBase)
+
+
