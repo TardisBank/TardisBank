@@ -23,15 +23,21 @@
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "eject": "react-scripts-ts eject",
+    "storybook": "start-storybook -p 9001 -c .storybook",
+    "build:storybook": "build-storybook"
   },
   "devDependencies": {
+    "@storybook/react": "^4.1.1",
     "@types/classnames": "^2.2.6",
     "@types/jest": "^23.3.1",
     "@types/node": "^10.5.7",
     "@types/react": "^16.4.8",
     "@types/react-dom": "^16.0.7",
     "@types/react-router-dom": "^4.3.0",
+    "@types/storybook__react": "^4.0.0",
+    "awesome-typescript-loader": "^5.2.1",
+    "storybook": "^1.0.0",
     "typescript": "^3.0.1"
   }
 }
