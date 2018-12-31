@@ -28,6 +28,7 @@
     "build:storybook": "build-storybook"
   },
   "devDependencies": {
+    "@storybook/core": "^4.1.4",
     "@storybook/react": "^4.1.1",
     "@types/classnames": "^2.2.6",
     "@types/jest": "^23.3.1",
