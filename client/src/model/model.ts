@@ -1,3 +1,4 @@
+import { Transaction } from './model';
 export type Account = {
     id: string,
     name: string,
@@ -13,3 +14,11 @@ export type AccountOperations = {
 
 export type Accounts = ReadonlyArray<Account>;
 
+export type Transaction = {
+    id: string,
+    accountId: string,
+    date: Date,
+    amount: number
+}
+
+export type Transactions = ReadonlyArray<Transaction>;

@@ -2,10 +2,55 @@ import * as React from 'react';
 import { TextField, Button, Typography } from '@material-ui/core';
 import { Form } from '../controls';
 
-export class AddTransaction extends React.Component {
+export type AddTransactionDispatchProps = {
+    addTransaction: (amount: number) => void;
+}
+
+export type AddTransactionState = {
+    amount?: string;
+    amountError: boolean;
+}
+
+export type AddTransactionProps = AddTransactionDispatchProps;
+
+export class AddTransaction extends React.Component<AddTransactionProps> {
+    state = {
+        amount: undefined,
+        amountError: false,
+    } as AddTransactionState;
+
+    handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({
+            ...this.state,
+            [event.target.name]: event.target.value
+        })
+    }
 
     private handleSubmit = (event: React.FormEvent) => {
 
+        const { amount } = this.state;
+        if(!amount) {
+            this.setState({
+                ...this.state,
+                amountError: true
+            });
+            return;
+        }
+        const value = parseFloat(amount);
+        
+        if(Number.isNaN(value)) {
+            this.setState({
+                ...this.state,
+                amountError: true
+            });
+            return;
+        }
+
+        this.props.addTransaction(value);
+        this.setState({
+            ...this.state,
+            amountError: false 
+        });
     }
 
     render() {
@@ -20,7 +65,7 @@ export class AddTransaction extends React.Component {
         return (
             <main>
                 <Typography>
-                    Add account for your child
+                    Add transaction
                 </Typography>
                 <Form onSubmit={this.handleSubmit}
                     submit={submitButton}
@@ -30,6 +75,10 @@ export class AddTransaction extends React.Component {
                         id='amount'
                         label="Amount"
                         fullWidth={true}
+                        required={true}
+
+                        error={this.state.amountError}
+                        onChange={this.handleChange}
                     />
                 </Form>
             </main>

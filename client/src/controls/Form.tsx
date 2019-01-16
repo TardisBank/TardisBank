@@ -17,9 +17,15 @@ type FormProps = {
 } & WithStyles<typeof styles> 
 
 class FormBase extends React.Component<FormProps>  {
+
+    handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
+        this.props.onSubmit(event);
+    }
+
     render() {
         return (
-            <form className={this.props.classes.form} onSubmit={this.props.onSubmit}>
+            <form className={this.props.classes.form} onSubmit={this.handleSubmit}>
                {this.props.children} 
                <div className={this.props.classes.submit}>
                    {this.props.submit}

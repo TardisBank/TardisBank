@@ -35,7 +35,6 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
     } as LoginState;
 
     handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
         const { email, password } = this.state;
         this.props.onLogin(email, password);
     }
