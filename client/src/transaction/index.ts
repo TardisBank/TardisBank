@@ -1,2 +1,2 @@
-export * from './AddTransactions';
+export * from './AddTransaction';
 export * from './ListTransactions';

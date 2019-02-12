@@ -35,7 +35,7 @@ class shell extends React.Component<ShellProps, ShellState> {
         this.setState(state => {
             return {
                 ...state,
-                contentView: ContentView.ShowAccount,
+                contentView: ContentView.ShowTransactions,
                 selectedAccount
             }
         })
@@ -64,10 +64,14 @@ class shell extends React.Component<ShellProps, ShellState> {
             return {
                 ...state,
                 selectedAccount: account.id,
-                contentView: ContentView.ShowAccount,
+                contentView: ContentView.ShowTransactions,
                 accountList: [...state.accountList, account] 
             }
         })
+    }
+
+    getActiveAccount = () => {
+        return this.state.selectedAccount && this.state.accountList.find((x: Account) => x.id === this.state.selectedAccount);
     }
 
     render() {
@@ -95,6 +99,7 @@ class shell extends React.Component<ShellProps, ShellState> {
                     <div className={classes.appBarSpacer} />
                     <Content
                         selectedAccount={this.state.selectedAccount}
+                        activeAccount={this.getActiveAccount()}
                         onAccountAdded={this.onAccountAdded}
                         viewType={this.state.contentView} />
                 </main>

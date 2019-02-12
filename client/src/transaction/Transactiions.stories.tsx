@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { storiesOf } from '@storybook/react';
-import { AddTransaction } from './AddTransactions';
+import { AddTransaction } from './AddTransaction';
 import { ListTransactions } from './ListTransactions';
 import { Transactions } from 'src/model';
 
@@ -11,7 +11,9 @@ const someTransactions: Transactions = Array.from({ length: 3 }).map((x: any, i:
     id: i,
     accountId: '1',
     amount: (i + 1) * 200,
-    date: new Date(2018, 0, (i +1), 0 , 0, 0, 0)
+    date: new Date(2018, 0, (i +1), 0 , 0, 0, 0),
+    balance: 100,
+    operations: {self: '1'}
   }
 })
 
