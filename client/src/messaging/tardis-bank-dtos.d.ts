@@ -36,4 +36,18 @@ declare module "tardis-bank-dtos" {
     interface AccountResponseCollection extends BaseDto {
         Accounts: ReadonlyArray<AccountResponse>
     }
+
+    interface TransactionRequest {
+        Amount: number;
+    }
+
+    interface TransactionResponse extends BaseDto {
+        TransactionDate: Date;
+        Amount: number;
+        Balance: number;
+    }
+
+    interface TransactionResponseCollection extends BaseDto {
+        Transactions: ReadonlyArray<TransactionResponse>
+    }
 }

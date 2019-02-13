@@ -3,6 +3,7 @@ import { Avatar, withStyles, WithStyles, Typography, Button, TextField } from '@
 import { LockOutlined } from '@material-ui/icons';
 import Paper from '@material-ui/core/Paper';
 import { styles } from './Login.styles';
+import { Form } from 'src/controls';
 
 type LoginState = {
     email: string,
@@ -34,7 +35,6 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
     } as LoginState;
 
     handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
         const { email, password } = this.state;
         this.props.onLogin(email, password);
     }
@@ -64,7 +64,18 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
                                 Incorrect email or password
                             </Typography>
                         }
-                        <form className={classes.form} onSubmit={this.handleSubmit}>
+                        <Form onSubmit={this.handleSubmit}
+                        submit={
+                           <Button
+                                type="submit"
+                                fullWidth={true}
+                                variant="raised"
+                                color="primary"
+                                disabled={this.props.loginProcess === LoginProcess.Loading}
+                            >
+                                Sign in
+                            </Button>
+                        }>
                             <TextField
                                 id="email"
                                 name="email"
@@ -88,19 +99,8 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
                                 value={this.state.password}
                                 onChange={this.handleChange}
                                 variant={"outlined"}
-
                             />
-                            <Button
-                                type="submit"
-                                fullWidth={true}
-                                variant="raised"
-                                color="primary"
-                                disabled={this.props.loginProcess === LoginProcess.Loading}
-                                className={classes.submit}
-                            >
-                                Sign in
-                            </Button>
-                        </form>
+                         </Form>
                         <Typography 
                             variant="caption">
                             <p>New to Tardis Bank?
@@ -108,7 +108,7 @@ class LoginBase extends React.Component<LoginProps, LoginState> {
                                     color="default"
                                     variant="outlined"
                                     fullWidth={true}
-                                    className={classes.submit}
+                                    className={classes.button}
                                     onClick={this.props.toggleSignIn}
                                 >
                                     Register Here</Button>

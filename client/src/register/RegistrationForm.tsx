@@ -3,6 +3,7 @@ import { Avatar, withStyles, WithStyles, Typography, Button, TextField } from '@
 import { PersonAdd } from '@material-ui/icons';
 import Paper from '@material-ui/core/Paper';
 import { styles } from './RegistrationForm.styles';
+import { Form } from 'src/controls';
 
 type RegisterState = {
     email: string,
@@ -90,7 +91,18 @@ class RegisterBase extends React.Component<RegisterProps, RegisterState> {
                                 The passwords do not match
                             </Typography>
                         }
-                        <form className={classes.form} onSubmit={this.handleSubmit}>
+                        <Form onSubmit={this.handleSubmit}
+                          submit={
+                            <Button
+                                type="submit"
+                                fullWidth={true}
+                                variant="raised"
+                                color="primary"
+                                disabled={this.props.registerProcess === RegisterProcess.Loading}
+                            >
+                                Register
+                            </Button>
+                          }>
                             <TextField
                                 id="email"
                                 name="email"
@@ -129,17 +141,7 @@ class RegisterBase extends React.Component<RegisterProps, RegisterState> {
                                 variant={"outlined"}
 
                             />
-                            <Button
-                                type="submit"
-                                fullWidth={true}
-                                variant="raised"
-                                color="primary"
-                                disabled={this.props.registerProcess === RegisterProcess.Loading}
-                                className={classes.submit}
-                            >
-                                Register
-                            </Button>
-                        </form>
+                        </Form>
                         <Typography variant="caption">
                             <a href="#" onClick={this.props.toggleSignIn}>Sign In</a>
                         </Typography>

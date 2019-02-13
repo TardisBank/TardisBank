@@ -23,12 +23,8 @@ export const styles = (theme: Theme) => createStyles({
         margin: theme.spacing.unit,
         backgroundColor: theme.palette.secondary.main
     },
-    form: {
-        width: '100%',
-        marginTop: theme.spacing.unit
-    },
-    submit: {
-        marginTop: theme.spacing.unit
+    button: {
+        marginTop: theme.spacing.unit 
     }
 });
 
