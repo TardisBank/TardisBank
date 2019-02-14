@@ -40,5 +40,10 @@
     "awesome-typescript-loader": "^5.2.1",
     "storybook": "^1.0.0",
     "typescript": "^3.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
