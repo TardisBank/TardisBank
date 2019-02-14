@@ -3,7 +3,7 @@ import { TextField, Button, Typography } from '@material-ui/core';
 import { Form } from '../controls/index';
 
 export type AddTransactionDispatchProps = {
-   addTransaction: (amount: number) => void; // Hello
+   addTransaction: (amount: number) => void; // Hello there
 }
 
 export type AddTransactionState = {
