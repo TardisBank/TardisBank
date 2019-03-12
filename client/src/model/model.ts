@@ -1,29 +1,34 @@
 export type Operations = {
-    self: string
-}
+  self: string;
+};
 
 export type AccountOperations = {
-    accountId: string,
-    transactions: string,
-    schedule: string
+  accountId: string;
+  transactions: string;
+  schedule: string;
 } & Operations;
 
 export type Account = {
-    id: string,
-    name: string,
-    operations: AccountOperations
-}
+  id: string;
+  name: string;
+  operations: AccountOperations;
+};
 
 export type Accounts = ReadonlyArray<Account>;
 
 export type TransactionOperations = Operations;
 
 export type Transaction = {
-    id: string,
-    date: Date,
-    amount: number,
-    balance: number,
-    operations: TransactionOperations
+  id: string;
+  date: Date;
+  amount: number;
+  balance: number;
+  operations: TransactionOperations;
+};
+
+export enum Direction {
+  Deposit,
+  Withdraw
 }
 
 export type Transactions = ReadonlyArray<Transaction>;
