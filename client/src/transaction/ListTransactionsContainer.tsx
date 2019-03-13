@@ -1,67 +1,134 @@
-import * as React from 'react';
-import { Account, Transaction } from '../model'
-import { ListTransactions } from './ListTransactions';
-import { getMessagingClient } from 'src/messaging';
-import { TransactionResponseCollection } from 'tardis-bank-dtos';
-import { fromTransactionResponseToTransaction } from 'src/messaging/adapters';
+import * as React from "react";
+import { Account, Transaction, Direction } from "../model";
+import { ListTransactions } from "./ListTransactions";
+import { getMessagingClient } from "src/messaging";
+import {
+  TransactionResponseCollection,
+  TransactionRequest,
+  TransactionResponse
+} from "tardis-bank-dtos";
+import { fromTransactionResponseToTransaction } from "src/messaging/adapters";
+import { RequestStatus } from "src/account";
+import { AddTransaction } from "./index";
 
 type ListTransactionStateProps = {
-    account: Account
-}
+  account: Account;
+};
 
 type ListTransactionContainerState = {
-    previousAccountId?: string;
-    transactions?: ReadonlyArray<Transaction>
-}
+  previousAccountId?: string;
+  transactions?: ReadonlyArray<Transaction>;
+  addTransactionStatus: RequestStatus;
+};
 
-type ListTransactionProps = ListTransactionStateProps
+export type ListTransactionProps = ListTransactionStateProps;
 
-export class ListTransactionContainer extends React.Component<ListTransactionProps, ListTransactionContainerState> {
+export class ListTransactionContainer extends React.Component<
+  ListTransactionProps,
+  ListTransactionContainerState
+> {
+  state = {
+    previousAccountId: undefined,
+    transactions: [],
+    addTransactionStatus: RequestStatus.Ready
+  };
 
-    state = {
-        previousAccountId: undefined,
-        transactions: []
-    };
+  componentDidMount() {
+    this.loadData(this.props.account.operations.transactions);
+  }
 
-    componentDidMount() {
-        this.loadData(this.props.account.operations.transactions);
+  componentDidUpdate = (
+    prevProps: ListTransactionProps,
+    prevState: ListTransactionContainerState
+  ) => {
+    if (!this.state.transactions) {
+      this.loadData(this.props.account.operations.transactions);
+    }
+  };
+
+  static getDerivedStateFromProps = (
+    props: ListTransactionProps,
+    state: ListTransactionContainerState
+  ): ListTransactionContainerState | null => {
+    if (props.account.id !== state.previousAccountId) {
+      return {
+        transactions: undefined,
+        previousAccountId: props.account.id,
+        addTransactionStatus: RequestStatus.Ready
+      };
     }
 
-    componentDidUpdate = (prevProps: ListTransactionProps, prevState: ListTransactionContainerState) => {
-        if(!this.state.transactions) {
-            this.loadData(this.props.account.operations.transactions);
+    return null;
+  };
+
+  loadData = (requestPath: string) =>
+    getMessagingClient()
+      .get<TransactionResponseCollection>(`api/${requestPath}`)
+      .then((response: TransactionResponseCollection) => {
+        const transactions = response.Transactions.map(x =>
+          fromTransactionResponseToTransaction(x)
+        );
+        this.setState(state => {
+          return {
+            ...state,
+            transactions
+          };
+        });
+      });
+
+  handleAddTransaction = (amount: number, direction: Direction) => {
+    this.setState({ addTransactionStatus: RequestStatus.Loading });
+    const Amount = direction === Direction.Withdraw ? amount * -1 : amount;
+    getMessagingClient()
+      .post<TransactionRequest, TransactionResponse>(
+        `api/${this.props.account.operations.transactions}`,
+        {
+          Amount
         }
-    }
+      )
+      .then(response => {
+        this.setState(state => {
+          const transaction = fromTransactionResponseToTransaction(response);
+          const transactions = [...this.state.transactions, transaction];
+          return {
+            ...state,
+            transactions,
+            registerProcess: RequestStatus.Sent
+          };
+        });
+      })
+      .catch(() => {
+        this.setState(state => {
+          return {
+            ...state,
+            registerProcess: RequestStatus.Error
+          };
+        });
+      });
+  };
 
-    static getDerivedStateFromProps = (props : ListTransactionProps, state: ListTransactionContainerState) : ListTransactionContainerState  | null => {
-        if(props.account.id !== state.previousAccountId) {
-            return {
-                transactions: undefined,
-                previousAccountId: props.account.id
-            }
+  render() {
+    let { transactions } = this.state;
+    const { account } = this.props;
+
+    // TODO: Manage the sorting in state not here.
+    if (transactions) {
+      transactions = transactions.sort((a: Transaction, b: Transaction) => {
+        if (a.date === b.date) {
+          return 0;
         }
-
-        return null;
+        return a.date > b.date ? -1 : 1;
+      });
     }
 
-    loadData = (requestPath: string) => 
-        getMessagingClient().get<TransactionResponseCollection>(`api/${requestPath}`)
-            .then((response:TransactionResponseCollection) => {
-                const transactions = response.Transactions.map((x) => fromTransactionResponseToTransaction(x))
-                this.setState(state => {
-                    return {
-                        ...state,
-                        transactions
-                    }
-                })
-            })
-
-
-    render() {
-
-        const { transactions } = this.state;
-        return (
-           transactions ? <ListTransactions transactions={transactions} {...this.props} /> : <div>No transactions</div>
-        )
-    }
+    return transactions ? (
+      <>
+        <h2>Transactions for {account.name}</h2>
+        <AddTransaction addTransaction={this.handleAddTransaction} />
+        <ListTransactions transactions={transactions} {...this.props} />
+      </>
+    ) : (
+      <div>No transactions</div>
+    );
+  }
 }
