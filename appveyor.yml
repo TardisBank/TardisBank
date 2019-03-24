@@ -12,7 +12,9 @@ before_build:
       fi
 
 build_script:
-  - sh: chmod +x ./build.sh
+  - sh: |
+      chmod +x ./build.sh
+      ./build.sh
 
 after_build:
   - sh: |
