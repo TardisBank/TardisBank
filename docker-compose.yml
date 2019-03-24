@@ -1,6 +1,7 @@
-version: '3'
+version: "3"
 services:
   db:
+    container_name: tardis_bank_db
     build: db
     ports:
       - "5432:5432"
@@ -10,9 +11,10 @@ services:
       POSTGRES_DB: ${TARDISBANK_DB_DATABASENAME:-tardisbank}
     expose:
       - "5432"
-      
+
   api:
     build: server
+    container_name: tardis_bank_api
     environment:
       TARDISBANK_DB_CON: "Server=db;Port=5432;Database=${TARDISBANK_DB_DATABASENAME:-tardisbank};User Id=${DB_USER:-tardisbank_app};Password=${TARDISBANK_DB_PASSWORD:-_wHaT3v3R};"
       TARDISBANK_KEY: ${TARDISBANK_KEY:-secret-key}
@@ -23,17 +25,30 @@ services:
     depends_on:
       - db
       - mail
-      
-  client:
-    build: client
+
+  nginx:
+    container_name: tardis_bank_nginx
+    build: devops
     ports:
       - "80:80"
-    environment:
-      NODE_ENV: prod
+    volumes:
+      - static-content:/usr/share/nginx/html
     depends_on:
       - api
-      
+      - client
+
+  client:
+    container_name: tardis_bank_static
+    build: client
+    environment:
+      NODE_ENV: prod
+    volumes:
+      - static-content:/app/build
+
   mail:
+    container_name: tardis_bank_smtp
     image: namshi/smtp
     expose:
       - "25"
+volumes:
+  static-content:
