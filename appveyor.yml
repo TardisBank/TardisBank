@@ -1,0 +1,22 @@
+image:
+  - Ubuntu1804
+
+services:
+  - docker
+
+before_build:
+  - sh: |
+      if [ "${PUSH_DOCKER}" == "true" ]
+      then
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      fi
+
+build_script:
+  - sh: chmod +x ./build.sh
+
+after_build:
+  - sh: |
+      if [ "${PUSH_DOCKER}" == "true" ]
+      then
+        docker logout
+      fi
