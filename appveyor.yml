@@ -4,17 +4,59 @@ image:
 services:
   - docker
 
+install:
+  - sh: |
+      PUSH_DOCKER = "false"
+      PROD_DEPLOY = "false"
+      TAG_NAME = ""
+
+      echo "APPVEYOR_REPO_TAG ${APPVEYOR_REPO_TAG}"
+
+      if [ "${APPVEYOR_REPO_TAG}" == "true" -a "${APPVEYOR_RE_BUILD}" == "true" ]
+      then
+        PROD_DEPLOY="true"
+        TAG_NAME="${APPVEYOR_REPO_TAG_NAME:1}"
+        echo "This is a production deployment for ${env:TAG_NAME}."
+      fi
+
+      if [[ ! -z "${DOCKER_USER}" ]] && [[ ! -z "${DOCKER_PASSWORD}" ]]
+      then 
+        PUSH_DOCKER="true"
+      fi
+
+      if [ "${APPVEYOR_REPO_TAG}" == "true" ]
+      then
+          tagName="${APPVEYOR_REPO_TAG_NAME:1}"
+          RELEASE_NAME="Version ${tagName}"
+      fi
+
 before_build:
   - sh: |
+      echo "docker push=${PUSH_DOCKER}"
       if [ "${PUSH_DOCKER}" == "true" ]
       then
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USER}" --password-stdin
       fi
 
 build_script:
   - sh: |
       chmod +x ./build.sh
       ./build.sh
+      ./build.sh tag dev
+
+      docker images
+
+      if [ "${PUSH_DOCKER}" == "true" ]
+      then
+        ./build.sh push dev
+
+        if [ "${PROD_DEPLOY}" == "true" ]
+        then
+          ./build.sh push beta
+          ./build.sh push latest
+          ./build.sh push "${TAG_NAME}"
+        fi
+      fi
 
 after_build:
   - sh: |
