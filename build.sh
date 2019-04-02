@@ -13,6 +13,7 @@ then
     docker push tardisbank/server:$TAG
     docker push tardisbank/client:$TAG
     docker push tardisbank/nginx:$TAG
+    docker push tardisbank/db:$TAG
 
 elif [ $# -gt 1 -a "$1" == "tag" ] 
 then
@@ -24,6 +25,7 @@ then
     docker tag tardisbank/server tardisbank/server:$TAG
     docker tag tardisbank/client tardisbank/client:$TAG
     docker tag tardisbank/nginx tardisbank/nginx:$TAG
+    docker tag tardisbank/db tardisbank/db:$TAG
 
 else
     echo "Building TardisBank"
@@ -37,4 +39,7 @@ else
 
     chmod u+x $DIR/nginx/build.sh
     $DIR/nginx/build.sh
+
+    chmod u+x $DIR/db/build.sh
+    $DIR/db/build.sh
 fi
