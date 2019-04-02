@@ -6,13 +6,13 @@ services:
 
 install:
   - sh: |
-      PUSH_DOCKER = "false"
-      PROD_DEPLOY = "false"
-      TAG_NAME = ""
+      PUSH_DOCKER="false"
+      PROD_DEPLOY="false"
+      TAG_NAME=""
 
-      echo "APPVEYOR_REPO_TAG ${APPVEYOR_REPO_TAG}"
+      echo "APPVEYOR_REPO_TAG=${APPVEYOR_REPO_TAG} APPVEYOR_RE_BUILD=${APPVEYOR_RE_BUILD}"
 
-      if [ "${APPVEYOR_REPO_TAG}" == "true" -a "${APPVEYOR_RE_BUILD}" == "true" ]
+      if [ "${APPVEYOR_REPO_TAG}" == "true" ]
       then
         PROD_DEPLOY="true"
         TAG_NAME="${APPVEYOR_REPO_TAG_NAME:1}"

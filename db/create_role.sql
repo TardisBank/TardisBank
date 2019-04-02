@@ -1,3 +1,2 @@
-CREATE USER tardisbank_app PASSWORD '_wHaT3v3R';
 GRANT CONNECT ON DATABASE tardisbank TO tardisbank_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO tardisbank_app;
