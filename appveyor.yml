@@ -44,6 +44,12 @@ build_script:
       ./build.sh
       ./build.sh tag dev
 
+      if [ "${PROD_DEPLOY}" == "true" ]
+      then
+        ./build.sh tag beta
+        ./build.sh tag "${TAG_NAME}"
+      fi
+
       docker images
 
       if [ "${PUSH_DOCKER}" == "true" ]
