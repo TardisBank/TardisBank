@@ -1,4 +1,3 @@
-
 # API
 
 - ~~Create application. GET / should work.~~
@@ -37,30 +36,44 @@
 
 - Run scheduler.
 
-- Deploy to Azure.
+- ~~Deploy to Azure.~~
 
 # FE
 
 - Homepage.
 
-- Signup.
+- ~~Signup.~~
 
-- Login.
+- ~~Login.~~
 
-- Create child.
+- ~~Create child.~~
 
-- List children.
+- ~~List children.~~
 
-- Delete child.
+- ~~Delete child.~~
 
-- Credit Transaction.
+- ~~Credit Transaction.~~
 
-- Debit Transaction.
+- ~~Debit Transaction.~~
 
-- List Transactions.
+- ~~List Transactions.~~
 
 - Add schedule.
 
 - List Schedules.
 
 - Delete Schdule.
+
+# Ops
+
+- HTTPS for all public endpoints
+
+- Deploy Dev and Prod to same server
+
+- Database migrations
+
+- Persitent database storage for Prod instance
+
+- Backup of prod database
+
+- Deploy server from AppVeyor
