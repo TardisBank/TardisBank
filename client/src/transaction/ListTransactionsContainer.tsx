@@ -63,7 +63,7 @@ export class ListTransactionContainer extends React.Component<
 
   loadData = (requestPath: string) =>
     getMessagingClient()
-      .get<TransactionResponseCollection>(`api/${requestPath}`)
+      .get<TransactionResponseCollection>(requestPath)
       .then((response: TransactionResponseCollection) => {
         const transactions = response.Transactions.map(x =>
           fromTransactionResponseToTransaction(x)
@@ -81,7 +81,7 @@ export class ListTransactionContainer extends React.Component<
     const Amount = direction === Direction.Withdraw ? amount * -1 : amount;
     getMessagingClient()
       .post<TransactionRequest, TransactionResponse>(
-        `api/${this.props.account.operations.transactions}`,
+        this.props.account.operations.transactions,
         {
           Amount
         }

@@ -43,9 +43,8 @@ class host extends React.Component<HostProps, HostState> {
     }
 
     getMessagingClient()
-      .get<HomeResultDto>(`/api/verify/${this.state.verificationToken}`)
+      .get<HomeResultDto>(`verify/${this.state.verificationToken}`)
       .then(result => {
-        console.log(result);
         this.setState(state => ({
           ...state,
           verificationToken: undefined,
@@ -56,7 +55,7 @@ class host extends React.Component<HostProps, HostState> {
 
   componentDidMount() {
     getMessagingClient()
-      .get<HomeResultDto>("api/")
+      .get<HomeResultDto>()
       .then(result => {
         this.setState(state => {
           return {
