@@ -23,7 +23,7 @@ export class AddAccountContainer extends React.Component<
     this.setState({ registerProcess: RequestStatus.Loading });
 
     getMessagingClient()
-      .post<AccountRequest, AccountResponse>("api/account", {
+      .post<AccountRequest, AccountResponse>("account", {
         AccountName: accountName
       })
       .then(response => {

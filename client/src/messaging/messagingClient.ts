@@ -1,7 +1,11 @@
 let messagingClient: MesssgingClient;
+type MessagingClientOptions = {
+  storageKey: string;
+  rootUrl: string;
+};
 
-export const initMessagingClient = (keyName: string) => {
-  messagingClient = createMessagingClient(keyName);
+export const initMessagingClient = (options: MessagingClientOptions) => {
+  messagingClient = createMessagingClient(options);
 };
 
 export const getMessagingClient = () => {
@@ -11,7 +15,10 @@ export const getMessagingClient = () => {
   return messagingClient;
 };
 
-const createMessagingClient = (storageKey: string) => {
+const createMessagingClient = ({
+  storageKey,
+  rootUrl
+}: MessagingClientOptions) => {
   const bearerToken = (): string | null => {
     return localStorage.getItem(storageKey);
   };
@@ -40,17 +47,21 @@ const createMessagingClient = (storageKey: string) => {
     return initObj;
   };
 
+  const setLocation = (path: string) => `${rootUrl}/${path}`;
+
   const post = <TMessage extends {}, TResponse extends {}>(
     location: string,
     request: TMessage
   ): Promise<TResponse> => {
     const requestHeader = requestInit("POST", request);
 
-    return fetch(location, requestHeader)
+    return fetch(setLocation(location), requestHeader)
       .then(result => {
         if (!result.ok) {
           throw new Error(
-            `Request for ${location} failed with ${result.statusText}`
+            `Request for ${setLocation(location)} failed with ${
+              result.statusText
+            }`
           );
         }
         return result.json();
@@ -60,11 +71,12 @@ const createMessagingClient = (storageKey: string) => {
       });
   };
 
-  const get = <TResponse extends {}>(location: string): Promise<TResponse> => {
-    return fetch(location, requestInit("GET")).then(result => {
+  const get = <TResponse extends {}>(location?: string): Promise<TResponse> => {
+    const getLocation = location ? setLocation(location) : rootUrl;
+    return fetch(getLocation, requestInit("GET")).then(result => {
       if (!result.ok) {
         throw new Error(
-          `Request for ${location} failed with ${result.statusText}`
+          `Request for ${getLocation} failed with ${result.statusText}`
         );
       }
       return result.json().then(json => {
@@ -86,7 +98,7 @@ type PostFn = <TMessage extends {}, TResponse extends {}>(
   request: TMessage
 ) => Promise<TResponse>;
 
-type GetFn = <TResponse extends {}>(location: string) => Promise<TResponse>;
+type GetFn = <TResponse extends {}>(location?: string) => Promise<TResponse>;
 
 export type MesssgingClient = {
   post: PostFn;
