@@ -1,0 +1,17 @@
+version: "3"
+services:
+  api:
+    ports:
+      - "5432:5432"
+    depends_on:
+      - mail
+
+  nginx:
+    ports:
+      - "4000:80"
+
+  mail:
+    container_name: tardis_bank_fake_smtp
+    image: rnwood/smtp4dev:linux-amd64-v3
+    ports:
+      - "4001:80"

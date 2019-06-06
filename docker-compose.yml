@@ -3,8 +3,6 @@ services:
   db:
     container_name: tardis_bank_db
     build: ./db
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: ${TARDISBANK_DB_USER:-tardisbank_app}
       POSTGRES_PASSWORD: ${TARDISBANK_DB_PASSWORD:-password}
@@ -19,19 +17,16 @@ services:
       TARDISBANK_DB_CON: "Server=db;Port=5432;Database=${TARDISBANK_DB_DATABASENAME:-tardisbank};User Id=${TARDISBANK_DB_USER:-tardisbank_app};Password=${TARDISBANK_DB_PASSWORD:-password};"
       TARDISBANK_KEY: ${TARDISBANK_KEY:-secret-key}
       TARDISBANK_SMTP_SERVER: "mail:25:false"
-      TARDISBANK_SMTP_CREDENTIALS: "username:password"
+      TARDISBANK_SMTP_CREDENTIALS: "${TARDISBANK_SMTP_CREDENTIALS:-username@example.com:password}"
       ASPNETCORE_ENVIRONMENT: "development"
     expose:
       - "80"
     depends_on:
       - db
-      - mail
 
   nginx:
     container_name: tardis_bank_nginx
     image: tardisbank/nginx
-    ports:
-      - "80:80"
     volumes:
       - static-content:/usr/share/nginx/html
     depends_on:
@@ -42,14 +37,9 @@ services:
     container_name: tardis_bank_static
     image: tardisbank/client
     environment:
-      NODE_ENV: prod
+      UUNODE_ENV: prod
     volumes:
       - static-content:/app/build
 
-  mail:
-    container_name: tardis_bank_smtp
-    image: namshi/smtp
-    expose:
-      - "25"
 volumes:
   static-content:
