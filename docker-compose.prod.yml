@@ -1,0 +1,15 @@
+version: "3"
+services:
+  api:
+    depends_on:
+      - mail
+
+  nginx:
+    ports:
+      - "80:80"
+
+  mail:
+    container_name: tardis_bank_smtp
+    image: namshi/smtp
+    expose:
+      - "25"
