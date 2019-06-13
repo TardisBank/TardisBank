@@ -55,7 +55,7 @@ class host extends React.Component<HostProps, HostState> {
 
   componentDidMount() {
     getMessagingClient()
-      .get<HomeResultDto>()
+      .get<HomeResultDto>("/")
       .then(result => {
         this.setState(state => {
           return {

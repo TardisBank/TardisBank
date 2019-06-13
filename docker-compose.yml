@@ -2,7 +2,7 @@ version: "3"
 services:
   db:
     container_name: tardis_bank_db
-    build: ./db
+    image: tardisbank/db:${TAG-dev}
     environment:
       POSTGRES_USER: ${TARDISBANK_DB_USER:-tardisbank_app}
       POSTGRES_PASSWORD: ${TARDISBANK_DB_PASSWORD:-password}
@@ -12,7 +12,7 @@ services:
 
   api:
     container_name: tardis_bank_api
-    image: tardisbank/server
+    image: tardisbank/server:${TAG-dev}
     environment:
       TARDISBANK_DB_CON: "Server=db;Port=5432;Database=${TARDISBANK_DB_DATABASENAME:-tardisbank};User Id=${TARDISBANK_DB_USER:-tardisbank_app};Password=${TARDISBANK_DB_PASSWORD:-password};"
       TARDISBANK_KEY: ${TARDISBANK_KEY:-secret-key}
@@ -26,7 +26,7 @@ services:
 
   nginx:
     container_name: tardis_bank_nginx
-    image: tardisbank/nginx
+    image: tardisbank/nginx:${TAG-dev}
     volumes:
       - static-content:/usr/share/nginx/html
     depends_on:
@@ -35,11 +35,18 @@ services:
 
   client:
     container_name: tardis_bank_static
-    image: tardisbank/client
+    command:
+      - /bin/bash
+      - -c
+      - |
+        rm -rf /content/*
+        cp -a /app/build/. /content
+        ls -lap /content
+    image: tardisbank/client:${TAG-dev}
     environment:
-      UUNODE_ENV: prod
+      NODE_ENV: prod
     volumes:
-      - static-content:/app/build
+      - static-content:/content
 
 volumes:
   static-content:
