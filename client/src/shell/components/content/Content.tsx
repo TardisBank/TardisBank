@@ -3,7 +3,7 @@ import { Account } from "../../../model";
 import { AddAccountContainer } from "../../../account/";
 import { Paper, WithStyles, withStyles } from "@material-ui/core";
 import { styles } from "./Content.styles";
-import { ListTransactionContainer } from "src/transaction/ListTransactionsContainer";
+import { ListTransactionContainer } from "../../../transaction/ListTransactionsContainer";
 
 export enum ContentView {
   "AddAccount",

@@ -67,7 +67,7 @@ const createMessagingClient = ({
         return result.json();
       })
       .then(json => {
-        return <TResponse>json;
+        return json as TResponse;
       });
   };
 
@@ -80,7 +80,7 @@ const createMessagingClient = ({
         );
       }
       return result.json().then(json => {
-        return <TResponse>json;
+        return json as TResponse;
       });
     });
   };
