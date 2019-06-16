@@ -7,7 +7,7 @@ import {
   TableCell,
   TableBody
 } from "@material-ui/core";
-import { Transactions, Transaction } from "src/model";
+import { Transactions, Transaction } from "../model";
 
 export type ListTransactionsProps = {
   transactions: Transactions;

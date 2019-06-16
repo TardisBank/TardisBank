@@ -3,8 +3,8 @@ import { Shell } from "../shell/Shell";
 import { getMessagingClient } from "../messaging/messagingClient";
 import { HomeResultDto } from "tardis-bank-dtos";
 import { withRoot } from "../withRoot";
-import { LoginContianer } from "src/log-in/LoginContainer";
-import { RegisterContianer } from "src/register/RegisterContainer";
+import { LoginContianer } from "../log-in/LoginContainer";
+import { RegisterContianer } from "../register/RegisterContainer";
 
 type HostState = {
   isAuthenticated: boolean;

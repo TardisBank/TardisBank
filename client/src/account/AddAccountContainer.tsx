@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Account } from "../model";
 import { AddAccount } from "./AddAccount";
-import { getMessagingClient } from "src/messaging";
+import { getMessagingClient } from "../messaging";
 import { AccountResponse, AccountRequest } from "tardis-bank-dtos";
-import { fromAccountResponseToAccount } from "src/messaging/adapters/accountResponse";
+import { fromAccountResponseToAccount } from "../messaging/adapters/accountResponse";
 
 export enum RequestStatus {
   Ready,

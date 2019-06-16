@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Register, RegisterProcess } from "./RegistrationForm";
-import { getMessagingClient } from "src/messaging";
+import { getMessagingClient } from "../messaging";
 import { RegisterRequest, RegisterResponse } from "tardis-bank-dtos";
 import { RegistrationSent } from "./RegistrationSent";
 

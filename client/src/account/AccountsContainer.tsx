@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Accounts } from "./Accounts";
 import { Account } from "../model";
-import { getMessagingClient } from "src/messaging";
+import { getMessagingClient } from "../messaging";
 import { AccountResponseCollection } from "tardis-bank-dtos";
-import { fromAccountResponseToAccount } from "src/messaging/adapters/accountResponse";
+import { fromAccountResponseToAccount } from "../messaging/adapters/accountResponse";
 
 type AccountsStateProps = {
   selectedAccountId?: string;

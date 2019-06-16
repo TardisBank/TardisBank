@@ -1,14 +1,14 @@
 import * as React from "react";
 import { Account, Transaction, Direction } from "../model";
 import { ListTransactions } from "./ListTransactions";
-import { getMessagingClient } from "src/messaging";
+import { getMessagingClient } from "../messaging";
 import {
   TransactionResponseCollection,
   TransactionRequest,
   TransactionResponse
 } from "tardis-bank-dtos";
-import { fromTransactionResponseToTransaction } from "src/messaging/adapters";
-import { RequestStatus } from "src/account";
+import { fromTransactionResponseToTransaction } from "../messaging/adapters";
+import { RequestStatus } from "../account";
 import { AddTransaction } from "./index";
 
 type ListTransactionStateProps = {

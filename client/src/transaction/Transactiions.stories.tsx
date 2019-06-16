@@ -2,7 +2,7 @@ import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { AddTransaction } from "./AddTransaction";
 import { ListTransactions } from "./ListTransactions";
-import { Transactions, Direction } from "src/model";
+import { Transactions, Direction } from "../model";
 
 const log = (s: any, direction: Direction) =>
   console.log(`Amount: ${s} direction: ${direction}`);

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Login, LoginProcess } from "./Login";
-import { getMessagingClient, LoginRequest } from "src/messaging";
+import { getMessagingClient, LoginRequest } from "../messaging";
 import { LoginResultDto } from "tardis-bank-dtos";
 
 type LoginContianerProps = {
