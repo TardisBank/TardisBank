@@ -1,0 +1,55 @@
+version: "3"
+services:
+  db:
+    build: db
+
+  api:
+    build: server
+    depends_on:
+      - mail
+
+  storybook:
+    build: client
+    command:
+      - npm
+      - run
+      - storybook
+    volumes:
+      - ./client/src:/app/src:ro
+      - ./client/package.json:/app/package.json:ro
+      - ./client/tsconfig.json:/app/tsconfig.json:ro
+    ports:
+      - "9001:9001"
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: dev
+
+  client:
+    build: client
+    command:
+      - yarn
+      - start
+    volumes:
+      - ./client/src:/app/src:ro
+      - ./client/package.json:/app/package.json:ro
+      - ./client/tsconfig.json:/app/tsconfig.json:ro
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: dev
+
+  nginx:
+    build: nginx
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+      - client
+
+  mail:
+    image: rnwood/smtp4dev:linux-amd64-v3
+    ports:
+      - "81:80"
