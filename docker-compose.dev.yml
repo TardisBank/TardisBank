@@ -38,6 +38,7 @@ services:
       - api
     environment:
       NODE_ENV: dev
+      PROXY_API: api
 
   nginx:
     build: nginx
