@@ -6,10 +6,12 @@ RUN mkdir /app
 WORKDIR /app
 
 # install and cache app dependencies
-COPY /src /app/src 
-COPY /public /app/public
 COPY ["package.json", "yarn.lock","tsconfig.json", "tsconfig.prod.json", "tslint.json", "./"]
 RUN yarn install
+
+COPY /src /app/src 
+
+COPY /public /app/public
 RUN yarn build
 
 # Deploy static using nginx

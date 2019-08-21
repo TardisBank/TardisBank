@@ -5,24 +5,25 @@
     "tasks": [
         {
             "label": "build",
-            "command": "dotnet build src\\TardisBank.sln",
+            "command": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml build",
             "type": "shell",
             "group": "build",
             "presentation": {
                 "reveal": "silent"
             },
-            "problemMatcher": "$msCompile"
+            "problemMatcher": [
+                "$msCompile", "$tsc"
+            ]
         },
         {
             "label": "run",
-            "command": "dotnet run --project src\\TardisBank.Api\\TardisBank.Api.csproj",
+            "command": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -V",
             "type": "shell",
             "group": "build",
             "presentation": {
                 "reveal": "always",
                 "panel": "new"
-            },
-            "problemMatcher": "$msCompile"
+            }
         }
     ]
 }
