@@ -14,9 +14,8 @@ services:
       - yarn
       - storybook
     volumes:
-      - ./client/src:/app/src:ro
-      - ./client/package.json:/app/package.json:ro
-      - ./client/tsconfig.json:/app/tsconfig.json:ro
+      - ./client:/app:ro
+      - /app/node_modules
     ports:
       - "9001:9001"
     depends_on:
@@ -30,9 +29,8 @@ services:
       - yarn
       - start
     volumes:
-      - ./client/src:/app/src:ro
-      - ./client/package.json:/app/package.json:ro
-      - ./client/tsconfig.json:/app/tsconfig.json:ro
+      - ./client:/app:ro
+      - /app/node_modules
     depends_on:
       - api
     environment:
