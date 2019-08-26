@@ -11,8 +11,7 @@ services:
   storybook:
     build: client
     command:
-      - npm
-      - run
+      - yarn
       - storybook
     volumes:
       - ./client/src:/app/src:ro
