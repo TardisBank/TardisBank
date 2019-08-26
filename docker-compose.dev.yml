@@ -22,7 +22,7 @@ services:
     depends_on:
       - api
     environment:
-      NODE_ENV: dev
+      NODE_ENV: development
 
   client:
     build: client
