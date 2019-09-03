@@ -1,5 +1,5 @@
 # base image
-FROM node:9.6.1 AS builder
+FROM node:10.16 AS builder
 
 # set working directory
 RUN mkdir /app

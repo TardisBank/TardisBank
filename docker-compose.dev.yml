@@ -11,19 +11,17 @@ services:
   storybook:
     build: client
     command:
-      - npm
-      - run
+      - yarn
       - storybook
     volumes:
-      - ./client/src:/app/src:ro
-      - ./client/package.json:/app/package.json:ro
-      - ./client/tsconfig.json:/app/tsconfig.json:ro
+      - ./client:/app:ro
+      - /app/node_modules
     ports:
       - "9001:9001"
     depends_on:
       - api
     environment:
-      NODE_ENV: dev
+      NODE_ENV: development
 
   client:
     build: client
@@ -31,9 +29,8 @@ services:
       - yarn
       - start
     volumes:
-      - ./client/src:/app/src:ro
-      - ./client/package.json:/app/package.json:ro
-      - ./client/tsconfig.json:/app/tsconfig.json:ro
+      - ./client:/app:ro
+      - /app/node_modules
     depends_on:
       - api
     environment:
