@@ -6,10 +6,17 @@ services:
 
   nginx:
     ports:
-      - "80:80"
+      - "80"
+    labels:
+      - traefik.backend=${COMPOSE_PROJECT_NAME:-test}.tardisbank_nginx
+      - traefik.frontend.rule=Host:${COMPOSE_PROJECT_NAME:-test}.tardisbank.net
+      - traefik.docker.network=web
+      - traefik.port=80
 
   mail:
-    container_name: tardis_bank_smtp
+    container_name: ${COMPOSE_PROJECT_NAME:-test}_tardis_bank_smtp
     image: namshi/smtp
     expose:
       - "25"
+    labels:
+      - traefik.enable=false

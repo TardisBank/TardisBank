@@ -27,6 +27,14 @@ then
     docker tag tardisbank/nginx tardisbank/nginx:$TAG
     docker tag tardisbank/db tardisbank/db:$TAG
 
+elif [ "$1" == "deploy" ] 
+then 
+    echo "Deploying TardisBank"
+    echo "-------------------------"
+
+    scp docker-compose.yml docker-compose.prod.yml root@dev.tardisbank.net:/root/tardisbank 
+    ssh root@dev.tardisbank.net "cd tardisbank && ls && docker-compose -f docker-compose.prod.yml -f docker-compose.yml down && docker-compose pull && docker-compose -f docker-compose.prod.yml -f docker-compose.yml up -d"
+
 else
     echo "Building TardisBank"
     echo "-------------------"
