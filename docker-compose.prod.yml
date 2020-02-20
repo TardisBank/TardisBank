@@ -16,6 +16,8 @@ services:
   mail:
     container_name: ${COMPOSE_PROJECT_NAME:-test}_tardis_bank_smtp
     image: namshi/smtp
+    networks:
+      - internal
     expose:
       - "25"
     labels:
