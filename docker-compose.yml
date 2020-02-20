@@ -9,7 +9,7 @@ networks:
 services:
   db:
     container_name: ${COMPOSE_PROJECT_NAME:-test}_tardis_bank_db
-    image: tardisbank/db:${TAG-dev}
+    image: tardisbank/db:${TAG:-dev}
     networks:
       - internal
     environment:
@@ -25,7 +25,7 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME:-test}_tardis_bank_api
     networks:
       - internal
-    image: tardisbank/server:${TAG-dev}
+    image: tardisbank/server:${TAG:-dev}
     environment:
       TARDISBANK_DB_CON: "Server=db;Port=5432;Database=${TARDISBANK_DB_DATABASENAME:-tardisbank};User Id=${TARDISBANK_DB_USER:-tardisbank_app};Password=${TARDISBANK_DB_PASSWORD:-password};"
       TARDISBANK_KEY: ${TARDISBANK_KEY:-secret-key}
@@ -41,7 +41,7 @@ services:
 
   nginx:
     container_name: ${COMPOSE_PROJECT_NAME:-test}_tardis_bank_nginx
-    image: tardisbank/nginx:${TAG-dev}
+    image: tardisbank/nginx:${TAG:-dev}
     volumes:
       - static-content:/usr/share/nginx/html
     depends_on:
@@ -49,10 +49,11 @@ services:
       - client
     networks:
       - internal
+      - web
 
   client:
     container_name: ${COMPOSE_PROJECT_NAME:-test}_tardis_bank_static
-    image: tardisbank/client:${TAG-dev}
+    image: tardisbank/client:${TAG:-dev}
     command:
       - /bin/bash
       - -c
