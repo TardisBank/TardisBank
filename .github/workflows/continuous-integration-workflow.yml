@@ -1,0 +1,13 @@
+name: continuous integratation
+on: [push]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: build containers
+        run: |
+          ls .
+          docker-compose -f docker-compose.prod.yml -f docker-compose.yml build
