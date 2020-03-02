@@ -1,13 +1,114 @@
 name: continuous integratation
-on: [push]
+on: [pull_request]
 
 jobs:
   build:
     name: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: build containers
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: set envs
         run: |
-          ls .
-          docker-compose -f docker-compose.prod.yml -f docker-compose.yml build
+          echo "::set-env name=BUILD_VERSION::$(git describe --tags)"
+          echo "$BUILD_VERSION"
+
+      - name: build containers
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          docker-compose \
+            -f docker-compose.build.yml -f docker-compose.yml \
+            build
+
+      - name: push containers
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+          SITE_DOMAIN_NAME: ${{ env.SITE_DOMAIN_NAME }}
+        run: |
+          echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+          docker-compose \
+            -f docker-compose.build.yml -f docker-compose.yml \
+            push api client nginx db
+
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: Get github slug variables
+        uses: rlespinasse/github-slug-action@master
+
+      - name: set envs
+        run: |
+          echo "::set-env name=BUILD_VERSION::$(git describe --tags)"
+          echo "::set-env name=SITE_SUBDOMAIN::pr-$(echo -e ${{ env.GITHUB_REF_SLUG }} | cut -d '-' -f 1)"
+
+      - name: run deploy script
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          DOT_ENV: ${{ secrets.DOT_ENV }}
+          COMPOSE_PROJECT_NAME: ${{ env.SITE_SUBDOMAIN }}
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          SITE_DOMAIN_NAME: ${{ env.SITE_DOMAIN_NAME }}
+          BUILD_VERSION: ${{ env.BUILD_VERSION }}
+        run: |
+          eval $(ssh-agent -s)
+
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+
+          ssh-keyscan $REMOTE_HOST >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+          echo "${DOT_ENV}" > ./devops/.env
+          echo "COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}" >> ./devops/.env
+
+          chmod u+x ./devops/deploy.sh
+          ./devops/deploy.sh
+
+  comment:
+    name: pull request message
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: set envs
+        run: |
+          echo "::set-env name=BUILD_VERSION::$(git describe --tags)"
+          echo "$BUILD_VERSION"
+
+      - name: Get github slug variables
+        uses: rlespinasse/github-slug-action@master
+      - run: |
+          echo ${{ env.GITHUB_REF_SLUG }}
+          echo ${{ env.GITHUB_HEAD_REF_SLUG }}
+          echo ${{ env.GITHUB_BASE_REF_SLUG }}
+          echo ${{ env.GITHUB_SHA_SHORT }}
+          echo "::set-env name=SITE_SUBDOMAIN::pr-$(echo -e ${{ env.GITHUB_REF_SLUG }} | cut -d '-' -f 1)"
+
+      - name: comment PR
+        uses: thollander/actions-comment-pull-request@master
+        with:
+          message: "Your PR has been deployed to [${{ env.SITE_SUBDOMAIN}}](https://${{env.SITE_SUBDOMAIN}}.${{secrets.SITE_DOMAIN_NAME}})"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
