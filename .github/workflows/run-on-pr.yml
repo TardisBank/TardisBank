@@ -1,0 +1,33 @@
+name: build on PR
+on: [pull_request]
+
+jobs:
+  comment:
+    name: PR message
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: set envs
+        run: |
+          echo "::set-env name=BUILD_VERSION::$(git describe --tags)"
+          echo "$BUILD_VERSION"
+
+      - name: Get github slug variables
+        uses: rlespinasse/github-slug-action@master
+      - run: |
+          echo ${{ env.GITHUB_REF_SLUG }}
+          echo ${{ env.GITHUB_HEAD_REF_SLUG }}
+          echo ${{ env.GITHUB_BASE_REF_SLUG }}
+          echo ${{ env.GITHUB_SHA_SHORT }}
+          echo "::set-env name=SITE_SUBDOMAIN::pr-$(echo -e ${{ env.GITHUB_REF_SLUG }} | cut -d '-' -f 1)"
+
+      - name: comment PR
+        uses: thollander/actions-comment-pull-request@master
+        with:
+          message: "Your PR has been deployed to [${{ env.SITE_SUBDOMAIN}}](https://${{env.SITE_SUBDOMAIN}}.${{secrets.SITE_DOMAIN_NAME}})"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
