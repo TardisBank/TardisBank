@@ -1,0 +1,33 @@
+name: build on PR
+on: [pull_request]
+
+jobs:
+  comment:
+    name: PR message
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
+      - name: set envs
+        run: |
+          echo "::set-env name=BUILD_VERSION::$(git describe --tags)"
+          echo "$BUILD_VERSION"
+
+      - name: Get github slug variables
+        uses: rlespinasse/github-slug-action@master
+      - run: |
+          echo ${{ env.GITHUB_REF_SLUG }}
+          echo ${{ env.GITHUB_HEAD_REF_SLUG }}
+          echo ${{ env.GITHUB_BASE_REF_SLUG }}
+          echo ${{ env.GITHUB_SHA_SHORT }}
+
+      - name: comment PR
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: "Check out this message!"
