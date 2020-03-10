@@ -1,0 +1,12 @@
+name: test env vars
+on: [push]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: print envars
+        run: |
+          echo "DOCKER_USERNAME=${{secrets.DOCKER_USERNAME}}"
+          echo "DOCKER_PASSWORD=${{secrets.DOCKER_PASSWORD}}"
