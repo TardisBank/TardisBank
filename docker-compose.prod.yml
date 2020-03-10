@@ -9,7 +9,7 @@ services:
       - "80"
     labels:
       - traefik.backend=${COMPOSE_PROJECT_NAME:-test}.tardisbank_nginx
-      - traefik.frontend.rule=Host:${COMPOSE_PROJECT_NAME:-test}.tardisbank.net
+      - traefik.frontend.rule=Host:${COMPOSE_PROJECT_NAME:-test}.${SITE_DOMAIN_NAME}
       - traefik.docker.network=web
       - traefik.port=80
 

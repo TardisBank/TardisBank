@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  db:
+    build:
+      dockerfile: Dockerfile
+      context: ./db
+
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: ./server
+
+  nginx:
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+
+  client:
+    build:
+      dockerfile: Dockerfile
+      context: ./client
