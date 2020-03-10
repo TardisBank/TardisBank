@@ -15,12 +15,14 @@ jobs:
       - name: set envs
         run: |
           echo "::set-env name=BUILD_VERSION::$(git describe --tags)"
-          echo "$BUILD_VERSION"
+          echo "BUILD_VERSION=${BUILD_VERSION}"
 
       - name: build containers
         env:
-          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_USER: tardisbank
         run: |
+          echo "${{ secrets.DOCKER_USERNAME}}"
+          echo "${{ env.DOCKER_USER}}"
           docker-compose \
             -f docker-compose.build.yml -f docker-compose.yml \
             build
