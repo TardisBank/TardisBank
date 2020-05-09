@@ -48,7 +48,7 @@ jobs:
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Get github slug variables
-        uses: rlespinasse/github-slug-action@master
+        uses: rlespinasse/github-slug-action@1.1.0
 
       - name: set envs
         run: |
